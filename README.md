@@ -12,5 +12,6 @@ Autohotkey project for idle game Zombidle
 - stats about items found
 - write stats to graphite to create awesome dashboards
 
-[[https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/graph.png|alt=octocat]]
+![[https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/graph.png|alt=octocat]]
+![octocat](https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/graph.png)
 
