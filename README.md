@@ -9,5 +9,8 @@ Autohotkey project for idle game Zombidle
 - change world if current world is finished
 - use abilities
 - all timers and click positions are configurable
-- stats about found items
+- stats about items found
 - write stats to graphite to create awesome dashboards
+
+[[https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/graph.png|alt=octocat]]
+
