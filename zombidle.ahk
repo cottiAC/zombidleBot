@@ -12,8 +12,9 @@ deal := false
 slothonly := false 
 chestfound := false
 hasfocus := false
-autoclick := false
 autolevel := false
+autoabilityon := true
+autolevelon := true
 
 world := "unknown"
 currenttab := "unknown"
@@ -32,7 +33,6 @@ IniRead, doubledmg, stats.log, loot, doubledmg, 0
 IniRead, chest3, stats.log, loot, chest3, 0
 
 IniRead, windowtitle, settings.ini, general, windowtitle
-IniRead, usegraphite, settings.ini, general, usegraphite
 IniRead, graphitehost, settings.ini, general, graphitehost
 IniRead, graphiteport, settings.ini, general, graphiteport
 IniRead, idletime, settings.ini, game, idletime
@@ -64,7 +64,7 @@ abilitycountown := Ceil(abilitytimer / 1000)
 xgui := A_ScreenWidth + A_ScreenWidth - 400
 ygui := A_ScreenHeight - 250
 
-Gui, +AlwaysOnTop -SysMenu +Owner  ; +Owner avoids a taskbar button.
+Gui, +AlwaysOnTop -SysMenu +Owner 
 Gui, Add, Text, x12 y30 , Click:
 Gui, Add, Radio, xp+120 yp gclicker vautoclickeron checked, On
 Gui, Add, Radio, xp+50 yp gclicker, Off
@@ -81,9 +81,9 @@ Gui, Add, Text,vstatus3 x12 w400,
 Gui, Add, Text,vstatus4 x12 w400, 
 Gui, Add, Button, x12 w100 gPauseButton Default, Bot pausieren
 Gui, Color, daffb4
-Gui, Show, x%xgui% y%ygui% NoActivate, Zombidle Status  ; NoActivate avoids deactivating the currently active window.
+Gui, Show, x%xgui% y%ygui% NoActivate, Zombidle Status
 
-logger("[GAME] Bot initialisiert. Starte generalLoop")
+logger("[GAME] Bot initialized. Start generalLoop")
 
 generalLoop()
 
@@ -110,7 +110,7 @@ abilities:
 			ControlSend,, 1, %windowtitle%
 			sleep, 50		
 		}
-		logger("[PROGRESS] Starte nur Sloth Ability")
+		logger("[PROGRESS] Start only Sloths Form")
 		slothonly := false
 	} else {
 		loop, 4 {
@@ -128,7 +128,7 @@ abilities:
 			sleep, 50
 			ControlSend,, 7, %windowtitle%		
 		}
-		logger("[PROGRESS] Starte alle Abilities")
+		logger("[PROGRESS] Starte all abilities")
 		slothonly := true
 	}
 	abilitycountown := Ceil(abilitytimer / 1000)
@@ -166,16 +166,16 @@ checkgame(stat) {
 	global
 	if (stat = "timer") {
 			if WinExist(windowtitle) {
-				GuiControl,,Status, Zombidle Fenster gefunden.
+				GuiControl,,Status, Zombidle window found.
 				exitThread := false
 				SetTimer, checkforgame, Off		
 			} else {
-				logger("[GAME] **** ERROR **** - Checkgame (timer) - Zombilde Fenster nicht gefunden")
+				logger("[GAME] **** ERROR **** - Checkgame (timer) - Zombilde window not found")
 			}
 	}
 	if (stat = "looper") {
 		if NOT WinExist(windowtitle) {
-			GuiControl,,Status, Fenster nicht gefunden. Pause.
+			GuiControl,,Status, Zombidle window mot found. Pause.
 			exitThread := true
 			SetTimer, checkforgame, 60000, On
 		}
@@ -239,17 +239,17 @@ checkworld(begposx, begposy, endposx, endposy) {
 		ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/world1complete.png
 		if (ErrorLevel = 0) {
 			world := "1"
-			logger("[PROGRESS] World 1 seems to be complete.")
+			logger("[PROGRESS] World 1 is complete.")
 		} else {
 			ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/world2complete.png
 			if (ErrorLevel = 0) {
 				world := "2"
-				logger("[PROGRESS] World 2 seems to be complete.")
+				logger("[PROGRESS] World 2 is complete.")
 				} else {
 				ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/world3complete.png
 				if (ErrorLevel = 0) {
 					world := "3"
-					logger("[PROGRESS] World 3 seems to be complete.")
+					logger("[PROGRESS] World 3 is complete.")
 				}
 			}
 		}
@@ -270,7 +270,7 @@ upgrademonster(begposx, begposy, endposx, endposy) {
 		upgrademonstertimer := 0
 		SetTimer, AutoFire, Off
 		
-		logger("[PROGRESS] Levling Monsters")
+		logger("[PROGRESS] Levling monsters")
 		currenttab := gettab(posx, posy, endposx, endposy)
 		if (currenttab != "monstertab") {
 			ControlClick, %monstertab% ,%windowtitle%,,,, Pos NA
@@ -338,7 +338,7 @@ upgrademonster(begposx, begposy, endposx, endposy) {
 
 generalLoop() {
 	global
-	logger("[GAME] generalLoop gestartet")
+	logger("[GAME] GeneralLoop started")
 	loop {
 		checkgame("looper")
 		if (exitThread) OR (pauser) {
@@ -355,23 +355,23 @@ generalLoop() {
 		
 		if (control = "GeckoFPSandboxChildWindow1") {
 			if (A_TimeIdle>=idletime) {
-				GuiControl,,Status, Aktiv! Maus im Zombidle Feld, aber inaktiv seit 60 Sekunden!
+				GuiControl,,Status, Active! Mouse pointer in zombidle window but inactive for more than %idletime% seconds.
 				hasfocus := false
 				activateautofire()
 			} else {
-				GuiControl,,Status, Inaktiv! Maus im Zombidle Feld!
+				GuiControl,,Status, Inactive! Mouse pointer in zombidle window.
 				hasfocus := true
 				SetTimer, AutoFire, Off		
 			}
 		} else if (class = "MozillaWindowClass" or class = "MozillaDropShadowWindowClass" or class = "MozillaDialogClass") {
 			if (A_TimeIdle>=idletime) {
 				activateautofire()
-				GuiControl,,Status, Aktiv! Maus im Browser, aber inaktiv seit 60 Sekunden!
+				GuiControl,,Status, Active! Mouse pointer in some browser window but inactive for more than %idletime% seconds.
 				hasfocus := false
 			} else {
 				SetTimer, AutoFire, Off
 				waittime := Ceil(A_TimeIdle / 1000)
-				GuiControl,,Status, Inaktiv! Maus im Browser! Idle seit: %waittime% Sekunden
+				GuiControl,,Status, Inactive! Mouse pointer in some browser window. Idle since: %waittime% seconds.
 				hasfocus := true
 				SetTimer, AutoFire, Off		
 			}
@@ -391,21 +391,21 @@ scrollHandle() {
 	global
 	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/thedeal.png
 	if (ErrorLevel = 0) {
-		logger("[LOOT] Deal gefunden, ohne Scroll geklickt zu haben.")
+		logger("[LOOT] Found deal without clicking scroll")
 		deal := true
 	}
 	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/scroll.png
 	if (ErrorLevel = 0 or deal = true) {
 		SetTimer, AutoFire, Off
 		if (deal = false) {
-			logger("[LOOT] Scroll gefunden")
+			logger("[LOOT] Scroll found")
 			GuiControl,,Status3, %FoundX% %FoundY%
 			clickx := FoundX - posx + 20
 			clicky := FoundY - posy + 20
 			loop {
 				ControlClick, x%clickx% y%clicky%,%windowtitle%,,,, Pos NA
 				sleep, 100
-				logger("[LOOT] Klicke auf Scroll")
+				logger("[LOOT] Clicking scroll")
 				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/scroll.png
 				if (ErrorLevel = 1) {
 					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/scrollinactive.png
@@ -457,31 +457,31 @@ identifiyloot() {
 	graph := "null"
 	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/skullmultiplier.png
 	if (ErrorLevel = 0) {
-		logger("[LOOT] x4 Skulls gefunden")
+		logger("[LOOT] x4 Skulls found")
 		skullmuliplier++
 		graph := "x4_Skull"
 	} else {
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/minushouse.png
 		if (ErrorLevel = 0) {
-			logger("[LOOT] -5 Level gefunden")
+			logger("[LOOT] -5 level found")
 			minuslevel++
 			graph := "5_Level"
 		} else {
 			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/crafttime.png
 			if (ErrorLevel = 0) {
-				logger("[LOOT] Crafting Time um 4 Stunden verringert")
+				logger("[LOOT] reduced 4h crafting time")
 				crafttime++
 				graph := "craftingTime"
 			} else {
 				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/diamonds.png
 				if (ErrorLevel = 0) {
-					logger("[LOOT] 5 Diamanten gefunden")
+					logger("[LOOT] 5 diamonds found")
 					fivediamond++
 					graph := "5_Diamonds"
 				} else {
 					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/specialadd.png
 					if (ErrorLevel = 0) {
-						logger("[LOOT] 10 Diamanten gefunden")
+						logger("[LOOT] 10 diamonds found")
 						tendiamond++
 						graph := "10_Diamonds"
 					} else {
@@ -493,12 +493,12 @@ identifiyloot() {
 						} else {
 							ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/3star.png
 							if (ErrorLevel = 0) {
-								logger("[LOOT] 3Sterne Kiste gefunden")
+								logger("[LOOT] 3 star chest found")
 								chest3++
 								graph := "Chest"
 								chestfound := true
 							} else {
-								logger("[LOOT] **** ERROR **** - konnte Loot nicht identifizieren")
+								logger("[LOOT] **** ERROR **** - could not identify loot")
 								TrayTip, WTF Loot, WTF Loot, 10, 1
 								graph := "NA"
 							}
@@ -508,9 +508,9 @@ identifiyloot() {
 			}
 		}
 	}
-	if (usegraphite) {
+	; if (usegraphite) {
+	IfExist, graphite.enable
 		Run %comspec% /c "echo zombidle.loot.%graph% 1 %T% | nc.exe %graphitehost% %graphiteport%",, Hide
-	}
 }
 
 lootprio() {
@@ -521,12 +521,12 @@ lootprio() {
 	
 	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/reward.png
 	if (ErrorLevel = 0) {
-		logger("[LOOT] Chest Loot gefunden.")
+		logger("[LOOT] found chest loot.")
 		lootlist := ["StoneTablet_2", "KingsCollar_2_3", "KingsCollar_2_4", "KingsCollar_3_2", "deathChalice_2", "MagicRing_2", "PowerPotion_2"]
 		for k, v in lootlist {
 			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/lootprio/%v%.png
 			if (ErrorLevel = 0) {
-				logger("[LOOT] %v% gefunden.")
+				logger("[LOOT] %v% found.")
 				clickx := FoundX - posx + 60
 				clicky := FoundY - posy + 240
 				MsgBox, Klicke auf x:%clickx% und y:%clicky%
@@ -534,7 +534,7 @@ lootprio() {
 				break
 			}
 		}
-		logger("[LOOT] Chestloot nicht identifizierbar.")
+		logger("[LOOT] Could not identify loot.")
 		TrayTip, Chestloot, Chestloot, 10, 1
 		sleep 10000 
 		ControlClick, x220 y580,%windowtitle%,,,, Pos NA
@@ -547,7 +547,7 @@ PauseButton:
 		SetTimer, abilities, Off
 		pauser := true
 		Gui, Color, EEAA99
-		logger("[GAME] Pause durch Button")
+		logger("[GAME] pause button pressed")
 		return
 	}
 	if (pauser = true) {
@@ -555,7 +555,7 @@ PauseButton:
 		SetTimer, abilities, %abilitytimer%, On
 		pauser := false
 		Gui, Color, daffb4
-		logger("[GAME] Pause aufgehoben durch Button")
+		logger("[GAME] Resuming")
 
 	}	
 return
