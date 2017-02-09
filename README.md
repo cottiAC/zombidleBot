@@ -20,7 +20,9 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 ## Limitation
 * works only with Firefox right now
 * in order to find scrolls, the browser windows must be visible
+* Bot will switch from world 2 to 1, 1 to 3, 3 to 4. So you need to start with world 2 
 * you need [Autohotkey v1.1.*] (https://autohotkey.com/) to run the script
+
 
 ## Graphite Instruction (optional)
 * [Install Graphite] (https://graphite.readthedocs.io/en/latest/install.html#id2)
