@@ -25,4 +25,7 @@ Autohotkey project for idle game Zombidle
 - identify and prioritize loot from chests
 - craft items
 
+## Thanks
+Thanks to kojaktsl and Lachhh for this awesome game. Keep up the good work.
+If you like Zombidle please support the developers. 
 
