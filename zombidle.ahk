@@ -13,6 +13,7 @@ slothonly := false
 chestfound := false
 hasfocus := false
 autolevel := false
+mainscreen := false
 autoabilityon := true
 autolevelon := true
 
@@ -175,7 +176,7 @@ checkgame(stat) {
 	}
 	if (stat = "looper") {
 		if NOT WinExist(windowtitle) {
-			GuiControl,,Status, Zombidle window mot found. Pause.
+			GuiControl,,Status, Zombidle window not found. Pause.
 			exitThread := true
 			SetTimer, checkforgame, 60000, On
 		}
@@ -231,6 +232,13 @@ gettab(begposx, begposy, endposx, endposy) {
 checkworld(begposx, begposy, endposx, endposy) {
 	global
 	checkworldtimer++
+	ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/tohell.png
+	if (ErrorLevel = 0) {
+		mainscreen := true
+	} else {
+		mainscreen := false
+	}
+	
 	if (checkworldtimer = switchworldinterval) {
 		checkworldtimer := 0
 		world := "unknown"
@@ -270,7 +278,7 @@ upgrademonster(begposx, begposy, endposx, endposy) {
 		upgrademonstertimer := 0
 		SetTimer, AutoFire, Off
 		
-		logger("[PROGRESS] Levling monsters")
+		logger("[PROGRESS] Leveling monsters")
 		currenttab := gettab(posx, posy, endposx, endposy)
 		if (currenttab != "monstertab") {
 			ControlClick, %monstertab% ,%windowtitle%,,,, Pos NA
@@ -439,7 +447,7 @@ scrollHandle() {
 
 activateautofire() {
 	global
-	if (pauser = true or autoclickeron = false) {
+	if (pauser = true or autoclickeron = false or mainscreen = false) {
 		return
 	} else {
 		SetTimer, AutoFire, %interval%, On
@@ -508,7 +516,7 @@ identifiyloot() {
 			}
 		}
 	}
-	; if (usegraphite) {
+
 	IfExist, graphite.enable
 		Run %comspec% /c "echo zombidle.loot.%graph% 1 %T% | nc.exe %graphitehost% %graphiteport%",, Hide
 }
@@ -547,7 +555,7 @@ PauseButton:
 		SetTimer, abilities, Off
 		pauser := true
 		Gui, Color, EEAA99
-		logger("[GAME] pause button pressed")
+		logger("[GAME] Pause button pressed")
 		return
 	}
 	if (pauser = true) {
