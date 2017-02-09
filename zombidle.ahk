@@ -32,11 +32,15 @@ IniRead, doubledmg, stats.log, loot, doubledmg, 0
 IniRead, chest3, stats.log, loot, chest3, 0
 
 IniRead, windowtitle, settings.ini, general, windowtitle
+IniRead, usegraphite, settings.ini, general, usegraphite
+IniRead, graphitehost, settings.ini, general, graphitehost
+IniRead, graphiteport, settings.ini, general, graphiteport
 IniRead, idletime, settings.ini, game, idletime
 IniRead, interval, settings.ini, game, interval
 IniRead, abilitytimer, settings.ini, game, abilitytimer
 IniRead, switchworldinterval, settings.ini, game, switchworldinterval
 IniRead, upgradeinterval, settings.ini, game, upgradeinterval
+IniRead, autoclick, settings.ini, positions, autoclick
 IniRead, worldtab, settings.ini, positions, worldtab
 IniRead, monstertab, settings.ini, positions, monstertab
 IniRead, scrollbar, settings.ini, positions, scrollbar
@@ -61,15 +65,15 @@ xgui := A_ScreenWidth + A_ScreenWidth - 400
 ygui := A_ScreenHeight - 250
 
 Gui, +AlwaysOnTop -SysMenu +Owner  ; +Owner avoids a taskbar button.
-Gui, Add, Text, x12 y29 h20 , Click:
-Gui, Add, Radio, xp+120 yp h20 gclicker vautoclickeron checked, On
-Gui, Add, Radio, xp+50 yp h20 gclicker, Off
-Gui, Add, Text, x12 y45 h20 , Buy monster upgrades:
-Gui, Add, Radio, xp+120 y45 h20 gautolevel vautolevelon checked, On
-Gui, Add, Radio, xp+50 y45 h20 gautolevel, Off
-Gui, Add, Text, x12 y61 h20 , use abilities:
-Gui, Add, Radio, xp+120 y61 h20 gautoability vautoabilityon checked, On
-Gui, Add, Radio, xp+50 y61 h20 gautoability, Off
+Gui, Add, Text, x12 y30 , Click:
+Gui, Add, Radio, xp+120 yp gclicker vautoclickeron checked, On
+Gui, Add, Radio, xp+50 yp gclicker, Off
+Gui, Add, Text, x12 yp+20, Buy monster upgrades:
+Gui, Add, Radio, xp+120 yp gautolevel vautolevelon checked, On
+Gui, Add, Radio, xp+50 yp gautolevel, Off
+Gui, Add, Text, x12 yp+20, use abilities:
+Gui, Add, Radio, xp+120 yp gautoability vautoabilityon checked, On
+Gui, Add, Radio, xp+50 yp gautoability, Off
 Gui, Add, GroupBox, x2 y9 w230 h80 , automatic actions
 Gui, Add, Text, vStatus x12 w400, Starting Bot!
 Gui, Add, Text,vstatus2 x12 w400, 
@@ -91,7 +95,7 @@ return
 
 AutoFire:
 	Critical
-	ControlClick, x250 y500, %windowtitle%,,,, Pos NA
+	ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
 	clicks++
 return
 
@@ -251,8 +255,6 @@ checkworld(begposx, begposy, endposx, endposy) {
 		}
 		if (world != "unknown") {
 			switchworld(world)
-		} else {
-			; ControlClick, x550 y250,%windowtitle%,,,, Pos NA
 		}
 	}
 }
@@ -347,7 +349,6 @@ generalLoop() {
 		WinGetPos, posx, posy, endposx, endposy, %windowtitle%		
 		MouseGetPos, , , id, control
 		WinGetClass, class, ahk_id %id%
-		; getstate(posx, posy, endposx, endposy)
 		upgrademonster(posx, posy, endposx, endposy)
 		checkworld(posx, posy, endposx, endposy)
 		scrollHandle()
@@ -501,13 +502,15 @@ identifiyloot() {
 								TrayTip, WTF Loot, WTF Loot, 10, 1
 								graph := "NA"
 							}
-						}						
-					}				
+						}
+					}
 				}
-			}		
+			}
 		}
 	}
-	Run %comspec% /c "echo zombidle.loot.%graph% 1 %T% | nc.exe 192.168.3.6 2003",, Hide
+	if (usegraphite) {
+		Run %comspec% /c "echo zombidle.loot.%graph% 1 %T% | nc.exe %graphitehost% %graphiteport%",, Hide
+	}
 }
 
 lootprio() {
@@ -548,7 +551,7 @@ PauseButton:
 		return
 	}
 	if (pauser = true) {
-		SetTimer, AutoFire, %interval%, On
+		activateautofire()
 		SetTimer, abilities, %abilitytimer%, On
 		pauser := false
 		Gui, Color, daffb4
