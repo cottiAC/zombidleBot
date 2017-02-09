@@ -534,16 +534,16 @@ lootprio() {
 		for k, v in lootlist {
 			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/lootprio/%v%.png
 			if (ErrorLevel = 0) {
-				logger("[LOOT] %v% found.")
+				logger("[LOOT] " . v . " found.")
 				clickx := FoundX - posx + 60
 				clicky := FoundY - posy + 240
-				MsgBox, Klicke auf x:%clickx% und y:%clicky%
+				; MsgBox, Klicke auf x:%clickx% und y:%clicky%
 				ControlClick, x%clickx% y%clicky%,%windowtitle%,,,, Pos NA
 				break
 			}
+			logger("[LOOT] Could not identify loot.")
+			; TrayTip, Chestloot, Chestloot, 10, 1
 		}
-		logger("[LOOT] Could not identify loot.")
-		TrayTip, Chestloot, Chestloot, 10, 1
 		sleep 10000 
 		ControlClick, x220 y580,%windowtitle%,,,, Pos NA
 	}	
