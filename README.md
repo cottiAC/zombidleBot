@@ -10,6 +10,7 @@ Autohotkey project for idle game Zombidle
 * change world if current world is finished
 * use abilities
 * simple GUI
+
 ![octocat](https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/gui.png)
 * most timers and click positions are configurable in ini-file
 * stats about items found
