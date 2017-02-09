@@ -79,7 +79,7 @@ Gui, Add, Text, vStatus x12 w400, Starting Bot!
 Gui, Add, Text,vstatus2 x12 w400, 
 Gui, Add, Text,vstatus3 x12 w400, 
 Gui, Add, Text,vstatus4 x12 w400, 
-Gui, Add, Button, x12 w100 gPauseButton Default, Bot pausieren
+Gui, Add, Button, x12 w100 gPauseButton Default, pause Bot
 Gui, Color, daffb4
 Gui, Show, x%xgui% y%ygui% NoActivate, Zombidle Status
 
@@ -377,7 +377,7 @@ generalLoop() {
 			}
 		} else {
 			activateautofire()
-			GuiControl,,Status, Aktiv!
+			GuiControl,,Status, Active!
 			hasfocus := false
 		}
 		if (chestfound = false and hasfocus = false) {
