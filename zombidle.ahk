@@ -4,12 +4,12 @@
 CoordMode, Pixel, Screen
 SetTitleMatchMode, 3
 SendMode Input
-SysGet, workArea, Monitor, 2 
+SysGet, workArea, Monitor, 2
 
-exitThread := false 
-pauser := false 
-deal := false 
-slothonly := false 
+exitThread := false
+pauser := false
+deal := false
+slothonly := false
 chestfound := false
 hasfocus := false
 autolevel := false
@@ -34,6 +34,8 @@ IniRead, doubledmg, stats.log, loot, doubledmg, 0
 IniRead, chest3, stats.log, loot, chest3, 0
 
 IniRead, windowtitle, settings.ini, general, windowtitle
+IniRead, windowwidth, settings.ini, general, windowwidth
+IniRead, windowheight, settings.ini, general, windowheight
 IniRead, graphitehost, settings.ini, general, graphitehost
 IniRead, graphiteport, settings.ini, general, graphiteport
 IniRead, idletime, settings.ini, game, idletime
@@ -65,9 +67,9 @@ abilitycountown := Ceil(abilitytimer / 1000)
 ;=============================
 
 xgui := A_ScreenWidth + A_ScreenWidth - 400
-ygui := A_ScreenHeight - 250
+ygui := A_ScreenHeight - 260
 
-Gui, +AlwaysOnTop -SysMenu +Owner 
+Gui, +AlwaysOnTop -SysMenu +Owner
 Gui, Add, Text, x12 y30 , Click:
 Gui, Add, Radio, xp+120 yp gclicker vautoclickeron checked, On
 Gui, Add, Radio, xp+50 yp gclicker, Off
@@ -79,9 +81,9 @@ Gui, Add, Radio, xp+120 yp gautoability vautoabilityon checked, On
 Gui, Add, Radio, xp+50 yp gautoability, Off
 Gui, Add, GroupBox, x2 y9 w230 h80 , automatic actions
 Gui, Add, Text, vStatus x12 w400, Starting Bot!
-Gui, Add, Text,vstatus2 x12 w400, 
-Gui, Add, Text,vstatus3 x12 w400, 
-Gui, Add, Text,vstatus4 x12 w400, 
+Gui, Add, Text,vstatus2 x12 w400,
+Gui, Add, Text,vstatus3 x12 w400,
+Gui, Add, Text,vstatus4 x12 w400,
 Gui, Add, Button, x12 w100 gPauseButton Default, pause Bot
 Gui, Color, daffb4
 Gui, Show, x%xgui% y%ygui% NoActivate, Zombidle Status
@@ -107,11 +109,11 @@ abilities:
 	if (!autoabilityon) {
 		return
 	}
-	
+
 	if (slothonly = true) {
 		loop, 4 {
 			ControlSend,, 1, %windowtitle%
-			sleep, 50		
+			sleep, 50
 		}
 		logger("[PROGRESS] Start only Sloths Form")
 		slothonly := false
@@ -129,7 +131,7 @@ abilities:
 			sleep, 50
 			ControlSend,, 6, %windowtitle%
 			sleep, 50
-			ControlSend,, 7, %windowtitle%		
+			ControlSend,, 7, %windowtitle%
 		}
 		logger("[PROGRESS] Starte all abilities")
 		slothonly := true
@@ -149,8 +151,8 @@ saveini:
 	IniWrite, %crafttime%, stats.log, loot, crafttime
 	IniWrite, %fivediamond%, stats.log, loot, fivediamond
 	IniWrite, %tendiamond%, stats.log, loot, tendiamond
-	IniWrite, %doubledmg%, stats.log, loot, doubledmg	
-	IniWrite, %chest3%, stats.log, loot, chest3	
+	IniWrite, %doubledmg%, stats.log, loot, doubledmg
+	IniWrite, %chest3%, stats.log, loot, chest3
 return
 
 guiupdate:
@@ -165,13 +167,65 @@ return
 ;======= Functions ===========
 ;=============================
 
+generalLoop() {
+	global
+	WinMove, %windowtitle%,, A_ScreenWidth, 0, %windowwidth%, %windowheight%
+	logger("[GAME] GeneralLoop started")
+	loop {
+		checkgame("looper")
+		if (exitThread) OR (pauser) {
+			SetTimer, AutoFire, Off
+			sleep 1000
+			continue
+		}
+		WinGetPos, posx, posy, endposx, endposy, %windowtitle%
+		MouseGetPos, , , id, control
+		WinGetClass, class, ahk_id %id%
+		upgrademonster()
+		checkworld()
+		scrollHandle()
+
+		if (control = "GeckoFPSandboxChildWindow1") {
+			if (A_TimeIdle>=idletime) {
+				GuiControl,,Status, Active! Mouse pointer in zombidle window but inactive for more than %idletime% seconds.
+				hasfocus := false
+				activateautofire()
+			} else {
+				GuiControl,,Status, Inactive! Mouse pointer in zombidle window.
+				hasfocus := true
+				SetTimer, AutoFire, Off
+			}
+		} else if (class = "MozillaWindowClass" or class = "MozillaDropShadowWindowClass" or class = "MozillaDialogClass") {
+			if (A_TimeIdle>=idletime) {
+				activateautofire()
+				GuiControl,,Status, Active! Mouse pointer in some browser window but inactive for more than %idletime% seconds.
+				hasfocus := false
+			} else {
+				SetTimer, AutoFire, Off
+				waittime := Ceil(A_TimeIdle / 1000)
+				GuiControl,,Status, Inactive! Mouse pointer in some browser window. Idle since: %waittime% seconds.
+				hasfocus := true
+				SetTimer, AutoFire, Off
+			}
+		} else {
+			activateautofire()
+			GuiControl,,Status, Active!
+			hasfocus := false
+		}
+		if (chestfound = false and hasfocus = false) {
+			lootprio()
+		}
+		sleep 1000
+	}
+}
+
 checkgame(stat) {
 	global
 	if (stat = "timer") {
 			if WinExist(windowtitle) {
 				GuiControl,,Status, Zombidle window found.
 				exitThread := false
-				SetTimer, checkforgame, Off		
+				SetTimer, checkforgame, Off
 			} else {
 				logger("[GAME] **** ERROR **** - Checkgame (timer) - Zombilde window not found")
 			}
@@ -193,8 +247,12 @@ switchworld(curworld) {
 		sleep 1000
 		ControlClick, %worldtab% ,%windowtitle%,,,, Pos NA
 		sleep 1000
-	}	
-	
+	}
+
+	loop, 10 {
+		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
+	}
+
 	sleep 1000
 	if (curworld = "1") {
 		ControlClick, x670 y515,%windowtitle%,,,, Pos NA
@@ -208,7 +266,7 @@ switchworld(curworld) {
 	}
 	if (curworld = "3") {
 		ControlClick, x550 y500,%windowtitle%,,,, Pos NA
-		sleep 1000		
+		sleep 1000
 		ControlClick, x600 y300,%windowtitle%,,,, Pos NA
 	}
 	sleep 1000
@@ -240,12 +298,12 @@ checkworld() {
 	} else {
 		mainscreen := false
 	}
-	
+
 	if (checkworldtimer = switchworldinterval) {
 		checkworldtimer := 0
 		world := "unknown"
 		currenttab := gettab()
-	
+
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
 		if (ErrorLevel = 0) {
 			world := "1"
@@ -275,7 +333,7 @@ upgrademonster() {
 	if (!autolevelon) {
 		return
 	}
-	
+
 	if (Mod(upgrademonstertimer, upgradecarlinterval) = 0) {
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
 		if (ErrorLevel = 0) {
@@ -283,20 +341,20 @@ upgrademonster() {
 			clickx := FoundX - posx + 0
 			clicky := FoundY - posy + 0
 			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
-		}	
+		}
 	}
-	
+
 	if (upgrademonstertimer = upgradeinterval) {
 		upgrademonstertimer := 0
 		SetTimer, AutoFire, Off
-		
+
 		logger("[PROGRESS] Leveling monsters")
 		currenttab := gettab()
 		if (currenttab != "monstertab") {
 			ControlClick, %monstertab% ,%windowtitle%,,,, Pos NA
 			sleep 1000
 		}
-		
+
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/maxbuy.png
 		if (ErrorLevel != 0) {
 			logger("[PROGRESS] Set buy size to MAX")
@@ -311,20 +369,12 @@ upgrademonster() {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
-		
+
 		ControlClick, %buyskills%, %windowtitle%,,,, Pos NA
 		sleep 75
-		
+
 		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
 		sleep 250
-
-		; ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
-		; if (ErrorLevel = 0) {
-			; logger("[PROGRESS] Leveling Carl.")
-			; clickx := FoundX - posx + 0
-			; clicky := FoundY - posy + 0
-			; ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
-		; }
 
 		sleep 75
 
@@ -339,7 +389,7 @@ upgrademonster() {
 			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
 		}
 		sleep 75
-		
+
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgradesquid.png
 		if (ErrorLevel = 0) {
 			logger("[PROGRESS] Leveling Squid.")
@@ -349,61 +399,9 @@ upgrademonster() {
 			sleep 75
 			clicky += 70
 			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
-		}			
+		}
 
 		activateautofire()
-	}
-}
-
-generalLoop() {
-	global
-	WinMove, %windowtitle%,, A_ScreenWidth, 0, %windowwidth%, %windowheight%
-	logger("[GAME] GeneralLoop started")
-	loop {
-		checkgame("looper")
-		if (exitThread) OR (pauser) {
-			SetTimer, AutoFire, Off
-			sleep 1000
-			continue
-		}
-		WinGetPos, posx, posy, endposx, endposy, %windowtitle%		
-		MouseGetPos, , , id, control
-		WinGetClass, class, ahk_id %id%
-		upgrademonster()
-		checkworld()
-		scrollHandle()
-		
-		if (control = "GeckoFPSandboxChildWindow1") {
-			if (A_TimeIdle>=idletime) {
-				GuiControl,,Status, Active! Mouse pointer in zombidle window but inactive for more than %idletime% seconds.
-				hasfocus := false
-				activateautofire()
-			} else {
-				GuiControl,,Status, Inactive! Mouse pointer in zombidle window.
-				hasfocus := true
-				SetTimer, AutoFire, Off		
-			}
-		} else if (class = "MozillaWindowClass" or class = "MozillaDropShadowWindowClass" or class = "MozillaDialogClass") {
-			if (A_TimeIdle>=idletime) {
-				activateautofire()
-				GuiControl,,Status, Active! Mouse pointer in some browser window but inactive for more than %idletime% seconds.
-				hasfocus := false
-			} else {
-				SetTimer, AutoFire, Off
-				waittime := Ceil(A_TimeIdle / 1000)
-				GuiControl,,Status, Inactive! Mouse pointer in some browser window. Idle since: %waittime% seconds.
-				hasfocus := true
-				SetTimer, AutoFire, Off		
-			}
-		} else {
-			activateautofire()
-			GuiControl,,Status, Active!
-			hasfocus := false
-		}
-		if (chestfound = false and hasfocus = false) {
-			lootprio()
-		}
-		sleep 1000
 	}
 }
 
@@ -472,7 +470,7 @@ logger(logtext) {
 
 identifiyloot() {
 	global
-	T = %A_NowUTC% 
+	T = %A_NowUTC%
 	T -= 19700101000000,seconds
 	graph := "null"
 	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/skullmultiplier.png
@@ -538,7 +536,7 @@ lootprio() {
 	if (pauser = true) {
 		return
 	}
-	
+
 	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/reward.png
 	if (ErrorLevel = 0) {
 		logger("[LOOT] found chest loot.")
@@ -554,9 +552,9 @@ lootprio() {
 			}
 			logger("[LOOT] Could not identify loot.")
 		}
-		sleep 10000 
+		sleep 10000
 		ControlClick, x220 y580,%windowtitle%,,,, Pos NA
-	}	
+	}
 }
 
 PauseButton:
@@ -575,12 +573,12 @@ PauseButton:
 		Gui, Color, daffb4
 		logger("[GAME] Resuming")
 
-	}	
+	}
 return
 
 clicker:
 GuiControlGet, autoclickeron
-if autoclickeron 
+if autoclickeron
 	activateautofire()
 else
 	SetTimer, AutoFire, Off
