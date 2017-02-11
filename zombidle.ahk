@@ -41,14 +41,16 @@ IniRead, interval, settings.ini, game, interval
 IniRead, abilitytimer, settings.ini, game, abilitytimer
 IniRead, switchworldinterval, settings.ini, game, switchworldinterval
 IniRead, upgradeinterval, settings.ini, game, upgradeinterval
+IniRead, upgradecarlinterval, settings.ini, game, upgradecarlinterval
 IniRead, autoclick, settings.ini, positions, autoclick
 IniRead, worldtab, settings.ini, positions, worldtab
 IniRead, monstertab, settings.ini, positions, monstertab
-IniRead, scrollbar, settings.ini, positions, scrollbar
+IniRead, scrollright, settings.ini, positions, scrollright
 IniRead, scrollleft, settings.ini, positions, scrollleft
 IniRead, carl, settings.ini, positions, carl
 IniRead, tombking, settings.ini, positions, tombking
 IniRead, maxbuy, settings.ini, positions, maxbuy
+IniRead, buyskills, settings.ini, positions, buyskills
 
 SetTimer, AutoFire, %interval%
 SetTimer, guiupdate, 1000
@@ -215,13 +217,13 @@ switchworld(curworld) {
 	activateautofire()
 }
 
-gettab(begposx, begposy, endposx, endposy) {
+gettab() {
 	global
-	ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/monstertab.png
+	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/monstertab.png
 	if (ErrorLevel = 0) {
 		tab := "monstertab"
 	} else {
-		ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/worldtab.png
+		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/worldtab.png
 		if (ErrorLevel = 0) {
 			tab := "worldtab"
 		}
@@ -229,10 +231,10 @@ gettab(begposx, begposy, endposx, endposy) {
 	return tab
 }
 
-checkworld(begposx, begposy, endposx, endposy) {
+checkworld() {
 	global
 	checkworldtimer++
-	ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/tohell.png
+	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/tohell.png
 	if (ErrorLevel = 0) {
 		mainscreen := true
 	} else {
@@ -242,19 +244,19 @@ checkworld(begposx, begposy, endposx, endposy) {
 	if (checkworldtimer = switchworldinterval) {
 		checkworldtimer := 0
 		world := "unknown"
-		currenttab := gettab(posx, posy, endposx, endposy)
+		currenttab := gettab()
 	
-		ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/world1complete.png
+		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
 		if (ErrorLevel = 0) {
 			world := "1"
 			logger("[PROGRESS] World 1 is complete.")
 		} else {
-			ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/world2complete.png
+			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world2complete.png
 			if (ErrorLevel = 0) {
 				world := "2"
 				logger("[PROGRESS] World 2 is complete.")
 				} else {
-				ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/world3complete.png
+				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world3complete.png
 				if (ErrorLevel = 0) {
 					world := "3"
 					logger("[PROGRESS] World 3 is complete.")
@@ -267,11 +269,21 @@ checkworld(begposx, begposy, endposx, endposy) {
 	}
 }
 
-upgrademonster(begposx, begposy, endposx, endposy) {
+upgrademonster() {
 	global
 	upgrademonstertimer++
 	if (!autolevelon) {
 		return
+	}
+	
+	if (Mod(upgrademonstertimer, upgradecarlinterval) = 0) {
+		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
+		if (ErrorLevel = 0) {
+			logger("[PROGRESS] Leveling Carl.")
+			clickx := FoundX - posx + 0
+			clicky := FoundY - posy + 0
+			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+		}	
 	}
 	
 	if (upgrademonstertimer = upgradeinterval) {
@@ -279,7 +291,7 @@ upgrademonster(begposx, begposy, endposx, endposy) {
 		SetTimer, AutoFire, Off
 		
 		logger("[PROGRESS] Leveling monsters")
-		currenttab := gettab(posx, posy, endposx, endposy)
+		currenttab := gettab()
 		if (currenttab != "monstertab") {
 			ControlClick, %monstertab% ,%windowtitle%,,,, Pos NA
 			sleep 1000
@@ -291,61 +303,61 @@ upgrademonster(begposx, begposy, endposx, endposy) {
 			loop, 10 {
 				ControlClick, %maxbuy% ,%windowtitle%,,,, Pos NA
 				sleep, 100
-				; logger("[LOOT] Klicke auf Scroll")
 				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/maxbuy.png
 			} until (ErrorLevel = 0)
 		}
 
 		loop, 15 {
-			ControlClick, %scrollbar%, %windowtitle%,,,, Pos NA
+			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
 		
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, *50 imgs/gotoarcane.png
-		if (ErrorLevel = 0) {
-			loop, 10 {
-				logger("[PROGRESS] Found arcane tab. Go back one click")
-				ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
-				sleep 500
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/gotoarcane.png
-			} until (ErrorLevel = 1)
-		}
+		ControlClick, %buyskills%, %windowtitle%,,,, Pos NA
+		sleep 75
 		
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/lvlnull.png
-		if (ErrorLevel = 0) {
-			logger("[PROGRESS] Found lvl 0 Monster. Level it up")
-			clickx := FoundX - posx + 0
-			clicky := FoundY - posy + 140
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
-		}
-		
-		sleep 100
-		ControlClick, %carl%, %windowtitle%,,,, Pos NA
-		sleep 100
-		ControlClick, %tombking%, %windowtitle%,,,, Pos NA
-		
-		
-		activateautofire()
-		
-		; ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/upgradeCarl.png
+		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
+		sleep 250
+
+		; ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
 		; if (ErrorLevel = 0) {
 			; logger("[PROGRESS] Leveling Carl.")
 			; clickx := FoundX - posx + 0
-			; clicky := FoundY - posy + 230
-			; ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA			
-		; }
-		; ImageSearch, FoundX, FoundY, %begposx%,%begposy%, begposx + endposx, begposy + endposy, imgs/upgradetombking.png
-		; if (ErrorLevel = 0) {
-			; logger("[PROGRESS] Leveling Tomb King.")
-			; clickx := FoundX - posx + 0
-			; clicky := FoundY - posy + 230
+			; clicky := FoundY - posy + 0
 			; ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
-		; }		
+		; }
+
+		sleep 75
+
+		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgradetombking.png
+		if (ErrorLevel = 0) {
+			logger("[PROGRESS] Leveling Tomb King.")
+			clickx := FoundX - posx + 0
+			clicky := FoundY - posy + 160
+			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			sleep 75
+			clicky += 70
+			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+		}
+		sleep 75
+		
+		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgradesquid.png
+		if (ErrorLevel = 0) {
+			logger("[PROGRESS] Leveling Squid.")
+			clickx := FoundX - posx + 0
+			clicky := FoundY - posy + 160
+			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			sleep 75
+			clicky += 70
+			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+		}			
+
+		activateautofire()
 	}
 }
 
 generalLoop() {
 	global
+	WinMove, %windowtitle%,, A_ScreenWidth, 0, %windowwidth%, %windowheight%
 	logger("[GAME] GeneralLoop started")
 	loop {
 		checkgame("looper")
@@ -357,8 +369,8 @@ generalLoop() {
 		WinGetPos, posx, posy, endposx, endposy, %windowtitle%		
 		MouseGetPos, , , id, control
 		WinGetClass, class, ahk_id %id%
-		upgrademonster(posx, posy, endposx, endposy)
-		checkworld(posx, posy, endposx, endposy)
+		upgrademonster()
+		checkworld()
 		scrollHandle()
 		
 		if (control = "GeckoFPSandboxChildWindow1") {
@@ -530,19 +542,17 @@ lootprio() {
 	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/reward.png
 	if (ErrorLevel = 0) {
 		logger("[LOOT] found chest loot.")
-		lootlist := ["StoneTablet_2", "KingsCollar_2_3", "KingsCollar_2_4", "KingsCollar_3_2", "deathChalice_2", "MagicRing_2", "PowerPotion_2"]
+		lootlist := ["StoneTablet_2", "StoneTablet_2", "KingsCollar_2_3", "KingsCollar_2_4", "KingsCollar_3_2", "deathChalice_2", "MagicRing_2", "PowerPotion_2"]
 		for k, v in lootlist {
 			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/lootprio/%v%.png
 			if (ErrorLevel = 0) {
 				logger("[LOOT] " . v . " found.")
 				clickx := FoundX - posx + 60
 				clicky := FoundY - posy + 240
-				; MsgBox, Klicke auf x:%clickx% und y:%clicky%
 				ControlClick, x%clickx% y%clicky%,%windowtitle%,,,, Pos NA
 				break
 			}
 			logger("[LOOT] Could not identify loot.")
-			; TrayTip, Chestloot, Chestloot, 10, 1
 		}
 		sleep 10000 
 		ControlClick, x220 y580,%windowtitle%,,,, Pos NA
