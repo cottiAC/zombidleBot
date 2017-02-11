@@ -160,7 +160,7 @@ guiupdate:
 		abilitycountown--
 	}
 	GuiControl,,Status2, Clicks: %clicks%    Scrolls: %scrolls%     Ability countdown: %abilitycountown%
-	GuiControl,,Status4, Upgrading in: %upgrademonstertimer% (%upgradeinterval%) - Switch World in:  %checkworldtimer% (%switchworldinterval%) - current tab: %currenttab%
+	GuiControl,,Status4, Upgrading in: %upgrademonstertimer% (%upgradeinterval%) - Check World in:  %checkworldtimer% (%switchworldinterval%) - current tab: %currenttab%
 return
 
 ;=============================
@@ -249,7 +249,7 @@ switchworld(curworld) {
 		sleep 1000
 	}
 
-	loop, 10 {
+	loop, 15 {
 		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
 	}
 
