@@ -66,7 +66,7 @@ abilitycountown := Ceil(abilitytimer / 1000)
 ;======= GUI =================
 ;=============================
 
-xgui := A_ScreenWidth + A_ScreenWidth - 400
+xgui := A_ScreenWidth - 400
 ygui := A_ScreenHeight - 260
 
 Gui, +AlwaysOnTop -SysMenu +Owner
