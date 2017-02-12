@@ -169,7 +169,7 @@ return
 
 generalLoop() {
 	global
-	WinMove, %windowtitle%,, A_ScreenWidth, 0, %windowwidth%, %windowheight%
+	; WinMove, %windowtitle%,, A_ScreenWidth, 0, %windowwidth%, %windowheight%
 	logger("[GAME] GeneralLoop started")
 	loop {
 		checkgame("looper")
