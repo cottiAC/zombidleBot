@@ -284,6 +284,8 @@ gettab() {
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/worldtab.png
 		if (ErrorLevel = 0) {
 			tab := "worldtab"
+		} else {
+			tab := "unknown"
 		}
 	}
 	return tab
@@ -353,6 +355,8 @@ upgrademonster() {
 		if (currenttab != "monstertab") {
 			sleep 500
 			ControlClick, %monstertab% ,%windowtitle%,,,, Pos NA
+			logger("[PROGRESS] Switching to Monstertab")
+
 			sleep 500
 		}
 
@@ -377,6 +381,15 @@ upgrademonster() {
 		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
 		sleep 250
 
+		sleep 75
+
+		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
+		if (ErrorLevel = 0) {
+			logger("[PROGRESS] Leveling Carl.")
+			clickx := FoundX - posx + 0
+			clicky := FoundY - posy + 0
+			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+		}
 		sleep 75
 
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgradetombking.png
