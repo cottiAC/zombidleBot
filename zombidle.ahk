@@ -351,8 +351,9 @@ upgrademonster() {
 		logger("[PROGRESS] Leveling monsters")
 		currenttab := gettab()
 		if (currenttab != "monstertab") {
+			sleep 500
 			ControlClick, %monstertab% ,%windowtitle%,,,, Pos NA
-			sleep 1000
+			sleep 500
 		}
 
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/maxbuy.png
@@ -444,7 +445,7 @@ scrollHandle() {
 		}
 		scrolls++
 		if (chestfound = true) {
-			sleep 30000
+			sleep 20000
 			lootprio()
 			chestfound := false
 		}
@@ -577,11 +578,11 @@ PauseButton:
 return
 
 clicker:
-GuiControlGet, autoclickeron
-if autoclickeron
-	activateautofire()
-else
-	SetTimer, AutoFire, Off
+	GuiControlGet, autoclickeron
+	if autoclickeron
+		activateautofire()
+	else
+		SetTimer, AutoFire, Off
 return
 
 autolevel:

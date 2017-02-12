@@ -5,7 +5,7 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 * visual detection
 * detect scrolls and collect them
 * auto clicking and collecting ghosts
-* level up Carl and TombKing
+* level up Carl, TombKing and Squid
 * change world if current world is finished
 * use abilities
 * simple GUI
@@ -19,6 +19,7 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 
 ## Limitation
 * works only with Firefox right now
+* if you use another browser window, the bot will not click to avoid take away focus
 * in order to find scrolls, the browser windows must be visible
 * Bot will switch from world 2 to 1, 1 to 3, 3 to 4. So you need to start with world 2 
 * you need [Autohotkey v1.1.*] (https://autohotkey.com/) to run the script
@@ -42,8 +43,6 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 * you can use [Grafana] (http://grafana.org/) to visualize it
 
 ## Known issues
-* Bot get stuck if you find a chest (need to improve lootprio function)
-* If its too laggy farming mode can be clicked during monster upgrade process
 * When game is paused, ability timer can go negative until next activation
 * With too much lag you sometimes get stuck on world map during world switch
 * "COME ON! CHOP CHOP!" message not handled
