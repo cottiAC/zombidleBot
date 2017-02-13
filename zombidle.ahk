@@ -33,17 +33,22 @@ IniRead, tendiamond, stats.log, loot, tendiamond, 0
 IniRead, doubledmg, stats.log, loot, doubledmg, 0
 IniRead, chest3, stats.log, loot, chest3, 0
 
-IniRead, windowtitle, settings.ini, general, windowtitle
-IniRead, windowwidth, settings.ini, general, windowwidth
-IniRead, windowheight, settings.ini, general, windowheight
-IniRead, graphitehost, settings.ini, general, graphitehost
-IniRead, graphiteport, settings.ini, general, graphiteport
-IniRead, idletime, settings.ini, game, idletime
-IniRead, interval, settings.ini, game, interval
-IniRead, abilitytimer, settings.ini, game, abilitytimer
-IniRead, switchworldinterval, settings.ini, game, switchworldinterval
-IniRead, upgradeinterval, settings.ini, game, upgradeinterval
-IniRead, upgradecarlinterval, settings.ini, game, upgradecarlinterval
+IniRead, guipos, privatesettings.ini, general, guipos, x0 y0
+IniRead, browserposx, privatesettings.ini, general, browserposx, 0
+IniRead, browserposy, privatesettings.ini, general, browserposy, 0
+IniRead, windowtitle, privatesettings.ini, general, windowtitle, Zombidle! - Mozilla Firefox
+IniRead, windowwidth, privatesettings.ini, general, windowwidth, 995
+IniRead, windowheight, privatesettings.ini, general, windowheight, 760
+IniRead, graphitehost, privatesettings.ini, general, graphitehost, 127.0.0.1
+IniRead, graphiteport, privatesettings.ini, general, graphiteport, 2003
+
+IniRead, idletime, privatesettings.ini, timer, idletime, 60000
+IniRead, interval, privatesettings.ini, timer, interval, 50
+IniRead, abilitytimer, privatesettings.ini, timer, abilitytimer, 325000
+IniRead, switchworldinterval, privatesettings.ini, timer, switchworldinterval, 10
+IniRead, upgradeinterval, privatesettings.ini, timer, upgradeinterval, 300
+IniRead, upgradecarlinterval, privatesettings.ini, timer, upgradecarlinterval, 10
+
 IniRead, autoclick, settings.ini, positions, autoclick
 IniRead, worldtab, settings.ini, positions, worldtab
 IniRead, monstertab, settings.ini, positions, monstertab
@@ -66,9 +71,6 @@ abilitycountown := Ceil(abilitytimer / 1000)
 ;======= GUI =================
 ;=============================
 
-xgui := A_ScreenWidth - 400
-ygui := A_ScreenHeight - 260
-
 Gui, +AlwaysOnTop -SysMenu +Owner
 Gui, Add, Text, x12 y30 , Click:
 Gui, Add, Radio, xp+120 yp gclicker vautoclickeron checked, On
@@ -86,9 +88,10 @@ Gui, Add, Text,vstatus3 x12 w400,
 Gui, Add, Text,vstatus4 x12 w400,
 Gui, Add, Button, x12 w100 gPauseButton Default, pause Bot
 Gui, Color, daffb4
-Gui, Show, x%xgui% y%ygui% NoActivate, Zombidle Status
+Gui, Show, %guipos% NoActivate, Zombidle Status
 
 logger("[GAME] Bot initialized. Start generalLoop")
+OnExit("saveinifunc")
 
 generalLoop()
 
@@ -144,15 +147,7 @@ checkforgame:
 return
 
 saveini:
-	IniWrite, %clicks%, stats.log, stats, clicks
-	IniWrite, %scrolls%, stats.log, stats, scrolls
-	IniWrite, %skullmuliplier%, stats.log, loot, skullmuliplier
-	IniWrite, %minuslevel%, stats.log, loot, minuslevel
-	IniWrite, %crafttime%, stats.log, loot, crafttime
-	IniWrite, %fivediamond%, stats.log, loot, fivediamond
-	IniWrite, %tendiamond%, stats.log, loot, tendiamond
-	IniWrite, %doubledmg%, stats.log, loot, doubledmg
-	IniWrite, %chest3%, stats.log, loot, chest3
+	saveinifunc()
 return
 
 guiupdate:
@@ -169,7 +164,7 @@ return
 
 generalLoop() {
 	global
-	; WinMove, %windowtitle%,, A_ScreenWidth, 0, %windowwidth%, %windowheight%
+	WinMove, %windowtitle%,, %browserposx%, %browserposy%, %windowwidth%, %windowheight%
 	logger("[GAME] GeneralLoop started")
 	loop {
 		checkgame("looper")
@@ -569,6 +564,39 @@ lootprio() {
 		sleep 10000
 		ControlClick, x220 y580,%windowtitle%,,,, Pos NA
 	}
+}
+
+saveinifunc() {
+	global
+	IniWrite, %clicks%, stats.log, stats, clicks
+	IniWrite, %scrolls%, stats.log, stats, scrolls
+	IniWrite, %skullmuliplier%, stats.log, loot, skullmuliplier
+	IniWrite, %minuslevel%, stats.log, loot, minuslevel
+	IniWrite, %crafttime%, stats.log, loot, crafttime
+	IniWrite, %fivediamond%, stats.log, loot, fivediamond
+	IniWrite, %tendiamond%, stats.log, loot, tendiamond
+	IniWrite, %doubledmg%, stats.log, loot, doubledmg
+	IniWrite, %chest3%, stats.log, loot, chest3
+
+	Gui +lastfound
+	WinGetPos, x, y
+	IniWrite, x%x% y%y%, privatesettings.ini, general, guipos
+	WinGetPos, posx, posy, endposx, endposy, %windowtitle%
+	IniWrite, %posx%, privatesettings.ini, general, browserposx
+	IniWrite, %posy%, privatesettings.ini, general, browserposy
+	IniWrite, %endposx%, privatesettings.ini, general, windowwidth
+	IniWrite, %endposy%, privatesettings.ini, general, windowheight
+
+	IniWrite, %graphitehost%, privatesettings.ini, general, graphitehost
+	IniWrite, %graphiteport%, privatesettings.ini, general, graphiteport
+	IniWrite, "%windowtitle%", privatesettings.ini, general, windowtitle
+
+	IniWrite, %idletime%, privatesettings.ini, timer, idletime
+	IniWrite, %interval%, privatesettings.ini, timer, interval
+	IniWrite, %abilitytimer%, privatesettings.ini, timer, abilitytimer
+	IniWrite, %switchworldinterval%, privatesettings.ini, timer, switchworldinterval
+	IniWrite, %upgradeinterval%, privatesettings.ini, timer, upgradeinterval
+	IniWrite, %upgradecarlinterval%, privatesettings.ini, timer, upgradecarlinterval
 }
 
 PauseButton:
