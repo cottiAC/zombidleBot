@@ -1,6 +1,14 @@
 # zombidleBot
 Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 
+## Overview
+* [Features] (#features)
+* [Limitation] (#limitation)
+* [Graphite Setup] (#graphite-instruction-optional)
+* [Known Issues] (#known-issues)
+* [Later releases] (#ideas-for-later-releases)
+* [Thanks] (#thanks)
+
 ## Features
 * visual detection
 * detect scrolls and collect them
@@ -10,12 +18,12 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 * use abilities
 * simple GUI
 
-![octocat](https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/gui.png)
+![](https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/gui.png)
 * most timers and click positions are configurable in ini-file
 * stats about items found
 * write stats to graphite to create awesome dashboards
 
-![octocat](https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/graph.png)
+![](https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/graph.png)
 
 ## Limitation
 * works only with Firefox right now
