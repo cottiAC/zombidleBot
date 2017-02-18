@@ -39,6 +39,7 @@ IniRead, browserposy, privatesettings.ini, general, browserposy, 0
 IniRead, windowtitle, privatesettings.ini, general, windowtitle, Zombidle! - Mozilla Firefox
 IniRead, windowwidth, privatesettings.ini, general, windowwidth, 995
 IniRead, windowheight, privatesettings.ini, general, windowheight, 760
+IniRead, graphiteenable, privatesettings.ini, general, graphiteenable, false
 IniRead, graphitehost, privatesettings.ini, general, graphitehost, 127.0.0.1
 IniRead, graphiteport, privatesettings.ini, general, graphiteport, 2003
 
@@ -303,8 +304,12 @@ checkworld() {
 
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
 		if (ErrorLevel = 0) {
-			world := "1"
-			logger("[PROGRESS] World 1 is complete.")
+			sleep, 4
+			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
+			if (ErrorLevel = 0) {
+				world := "1"
+				logger("[PROGRESS] World 1 is complete.")
+			}
 		} else {
 			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world2complete.png
 			if (ErrorLevel = 0) {
@@ -536,7 +541,7 @@ identifiyloot() {
 		}
 	}
 
-	IfExist, graphite.enable
+	if graphiteenable = true
 		Run %comspec% /c "echo zombidle.loot.%graph% 1 %T% | nc.exe %graphitehost% %graphiteport%",, Hide
 }
 
@@ -581,22 +586,13 @@ saveinifunc() {
 	Gui +lastfound
 	WinGetPos, x, y
 	IniWrite, x%x% y%y%, privatesettings.ini, general, guipos
-	WinGetPos, posx, posy, endposx, endposy, %windowtitle%
-	IniWrite, %posx%, privatesettings.ini, general, browserposx
-	IniWrite, %posy%, privatesettings.ini, general, browserposy
-	IniWrite, %endposx%, privatesettings.ini, general, windowwidth
-	IniWrite, %endposy%, privatesettings.ini, general, windowheight
-
-	IniWrite, %graphitehost%, privatesettings.ini, general, graphitehost
-	IniWrite, %graphiteport%, privatesettings.ini, general, graphiteport
-	IniWrite, "%windowtitle%", privatesettings.ini, general, windowtitle
-
-	IniWrite, %idletime%, privatesettings.ini, timer, idletime
-	IniWrite, %interval%, privatesettings.ini, timer, interval
-	IniWrite, %abilitytimer%, privatesettings.ini, timer, abilitytimer
-	IniWrite, %switchworldinterval%, privatesettings.ini, timer, switchworldinterval
-	IniWrite, %upgradeinterval%, privatesettings.ini, timer, upgradeinterval
-	IniWrite, %upgradecarlinterval%, privatesettings.ini, timer, upgradecarlinterval
+	if WinExist(windowtitle) {
+		WinGetPos, posx, posy, endposx, endposy, %windowtitle%
+		IniWrite, %posx%, privatesettings.ini, general, browserposx
+		IniWrite, %posy%, privatesettings.ini, general, browserposy
+		IniWrite, %endposx%, privatesettings.ini, general, windowwidth
+		IniWrite, %endposy%, privatesettings.ini, general, windowheight
+	}
 }
 
 PauseButton:
