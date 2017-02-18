@@ -49,8 +49,8 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 
 ## Graphite Instruction (optional)
 * [Install Graphite] (https://graphite.readthedocs.io/en/latest/install.html#id2)
-* configure your Graphite host and port in settings.ini (**general** tab)
-* create a file named `graphite.enable` in your zombidleBot folder
+* configure your Graphite host and port in privatesettings.ini (privatesettings.ini will be created after first Bot start)
+* change **graphiteenable** to true in your privatesettings.ini
 * Download netcat (nc.exe) from [netcat Homepage] (http://netcat.sourceforge.net/) or use the [cygwin netcat] (https://cygwin.com/) and include it to your PATH variable
 * structure of whisper paths are `zombidle.loot.%graph%`. %graph% can be:
   * x4_Skull
