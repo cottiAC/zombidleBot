@@ -2,12 +2,26 @@
 Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 
 ## Overview
+* [Getting Started and Upgrading to latest Bot version] (#getting-started)
 * [Features] (#features)
 * [Limitation] (#limitation)
 * [Graphite Setup] (#graphite-instruction-optional)
 * [Known Issues] (#known-issues)
 * [Later releases] (#ideas-for-later-releases)
 * [Thanks] (#thanks)
+
+## Getting Started
+* Install  [Autohotkey v1.1.*] (https://autohotkey.com/)
+* Download [latest zombildeBot release] (https://github.com/cottiAC/zombidleBot/releases/latest) and unpack
+* Open a seperate Firefox window (<kbd>Ctrl+N</kbd> in FF) and go to [http://www.zombidle.de] (http://www.zombidle.de)
+* Start zombidle.ahk 
+
+### Upgrading to latest version
+* Download [latest zombildeBot release] (https://github.com/cottiAC/zombidleBot/releases/latest) and unpack
+* Copy over following files from old release, to restore settings and progress:
+  * privatesettings.ini
+  * stats.log
+  * status.log
 
 ## Features
 * visual detection
