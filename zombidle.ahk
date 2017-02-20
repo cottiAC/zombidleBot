@@ -21,6 +21,8 @@ world := "unknown"
 currenttab := "unknown"
 checkworldtimer := 0
 upgrademonstertimer := 0
+lootlist := ["tablet", "ring", "potion", "chalice", "king", "lich", "zombie", "bat", "mace", "plague", "specter", "squid", "axe"]
+
 
 IniRead, clicks, stats.log, stats, clicks, 0
 IniRead, scrolls, stats.log, stats, scrolls, 0
@@ -208,7 +210,7 @@ generalLoop() {
 			GuiControl,,Status, Active!
 			hasfocus := false
 		}
-		if (chestfound = false and hasfocus = false) {
+		if (hasfocus = false) {
 			lootprio()
 		}
 		sleep 1000
@@ -457,11 +459,11 @@ scrollHandle() {
 			sleep, 100
 		}
 		scrolls++
-		if (chestfound = true) {
-			sleep 20000
-			lootprio()
-			chestfound := false
-		}
+		; if (chestfound = true) {
+			; sleep 20000
+			; lootprio()
+			; chestfound := false
+		; }
 		activateautofire()
 		deal := false
 	} else if (ErrorLevel = 1) {
@@ -553,21 +555,27 @@ lootprio() {
 
 	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/reward.png
 	if (ErrorLevel = 0) {
+		knownloot := false
 		logger("[LOOT] found chest loot.")
-		lootlist := ["StoneTablet_2", "StoneTablet_2", "KingsCollar_2_3", "KingsCollar_2_4", "KingsCollar_3_2", "deathChalice_2", "MagicRing_2", "PowerPotion_2"]
 		for k, v in lootlist {
-			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/lootprio/%v%.png
-			if (ErrorLevel = 0) {
-				logger("[LOOT] " . v . " found.")
-				clickx := FoundX - posx + 60
-				clicky := FoundY - posy + 240
-				ControlClick, x%clickx% y%clicky%,%windowtitle%,,,, Pos NA
-				break
+			quality = 0
+			loop, 3 {
+				quality++
+				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, *50 imgs/lootprio/%v%_%quality%.png
+				if (ErrorLevel = 0) {
+					logger("[LOOT] " . v . "_" . quality . " found.")
+					clickx := FoundX - posx + 60
+					clicky := FoundY - posy + 240
+					ControlClick, x%clickx% y%clicky%,%windowtitle%,,,, Pos NA
+					knownloot := true
+					break 2
+				}
 			}
-			logger("[LOOT] Could not identify loot.")
 		}
-		sleep 10000
-		ControlClick, x220 y580,%windowtitle%,,,, Pos NA
+		if (knownloot = false) {
+			logger("[LOOT] could not identify chest loot. Taking the first item")
+			pause
+		}
 	}
 }
 
@@ -593,6 +601,18 @@ saveinifunc() {
 		IniWrite, %endposx%, privatesettings.ini, general, windowwidth
 		IniWrite, %endposy%, privatesettings.ini, general, windowheight
 	}
+
+	IniWrite, %graphitehost%, privatesettings.ini, general, graphitehost
+	IniWrite, %graphiteport%, privatesettings.ini, general, graphiteport
+	IniWrite, %graphiteenable%, privatesettings.ini, general, graphiteenable
+	IniWrite, "%windowtitle%", privatesettings.ini, general, windowtitle
+
+	IniWrite, %idletime%, privatesettings.ini, timer, idletime
+	IniWrite, %interval%, privatesettings.ini, timer, interval
+	IniWrite, %abilitytimer%, privatesettings.ini, timer, abilitytimer
+	IniWrite, %switchworldinterval%, privatesettings.ini, timer, switchworldinterval
+	IniWrite, %upgradeinterval%, privatesettings.ini, timer, upgradeinterval
+	IniWrite, %upgradecarlinterval%, privatesettings.ini, timer, upgradecarlinterval
 }
 
 PauseButton:
