@@ -76,15 +76,19 @@ abilitycountown := Ceil(abilitytimer / 1000)
 
 Gui, +AlwaysOnTop -SysMenu +Owner
 Gui, Add, Text, x12 y30 , Click:
-Gui, Add, Radio, xp+120 yp gclicker vautoclickeron checked, On
+Gui, Add, Radio, xp+75 yp gclicker vautoclickeron checked, On
 Gui, Add, Radio, xp+50 yp gclicker, Off
-Gui, Add, Text, x12 yp+20, Buy monster upgrades:
-Gui, Add, Radio, xp+120 yp gautolevel vautolevelon checked, On
+Gui, Add, Text, xp+70 yp, find chests:
+Gui, Add, Radio, xp+75 yp gautochest vautocheston checked, On
+Gui, Add, Radio, xp+50 yp gautochest, Off
+Gui, Add, Text, x12 yp+20, Buy monster:
+Gui, Add, Radio, xp+75 yp gautolevel vautolevelon checked, On
 Gui, Add, Radio, xp+50 yp gautolevel, Off
 Gui, Add, Text, x12 yp+20, use abilities:
-Gui, Add, Radio, xp+120 yp gautoability vautoabilityon checked, On
+Gui, Add, Radio, xp+75 yp gautoability vautoabilityon checked, On
 Gui, Add, Radio, xp+50 yp gautoability, Off
-Gui, Add, GroupBox, x2 y9 w230 h80 , automatic actions
+Gui, Add, GroupBox, x2 y9 w180 h80 , automatic actions
+Gui, Add, GroupBox, xp+190 y9 w180 h80 , world actions
 Gui, Add, Text, vStatus x12 w400, Starting Bot!
 Gui, Add, Text,vstatus2 x12 w400,
 Gui, Add, Text,vstatus3 x12 w400,
@@ -247,7 +251,10 @@ switchworld(curworld) {
 		sleep 1000
 	}
 
-	collectchests(curworld)
+	if (autocheston) {
+		collectchests(curworld)
+	}
+
 	sleep, 3000
 	loop, 15 {
 		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
@@ -772,3 +779,5 @@ GuiControlGet, autolevelon
 autoability:
 GuiControlGet, autoabilityon
 
+autochest:
+GuiControlGet, autocheston
