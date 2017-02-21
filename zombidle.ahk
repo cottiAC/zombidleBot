@@ -247,11 +247,15 @@ switchworld(curworld) {
 		sleep 1000
 	}
 
+	collectchests(curworld)
+	sleep, 3000
 	loop, 15 {
 		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
+		sleep 75
 	}
 
 	sleep 1000
+
 	if (curworld = "1") {
 		ControlClick, x670 y515,%windowtitle%,,,, Pos NA
 		sleep 1000
@@ -271,6 +275,130 @@ switchworld(curworld) {
 	ControlClick, x700 y530,%windowtitle%,,,, Pos NA
 	sleep 500
 	activateautofire()
+}
+
+collectchests(curworld) {
+	global
+	logger("[PROGRESS] Collecting chest")
+
+	loop, 15 {
+		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
+		sleep 75
+	}
+	if (curworld = "1") {
+		loop, 3 {
+			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+			sleep 75
+		}
+		ControlClick, x560 y606,%windowtitle%,,,, Pos NA
+		sleep 300
+		ControlClick, x860 y620,%windowtitle%,,,, Pos NA
+		sleep 2000
+		lootprio()
+		sleep 3000
+		ControlClick, x860 y620,%windowtitle%,,,, Pos NA
+		sleep 1000
+		loop, 3 {
+			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+			sleep 75
+		}
+		ControlClick, x864 y451,%windowtitle%,,,, Pos NA
+		sleep 2000
+		lootprio()
+		sleep 3000
+		ControlClick, x864 y451,%windowtitle%,,,, Pos NA
+		sleep 1000
+		ControlClick, x874 y532,%windowtitle%,,,, Pos NA
+		sleep 2000
+		lootprio()
+		sleep 3000
+		ControlClick, x874 y532,%windowtitle%,,,, Pos NA
+		sleep 1000
+		loop, 5 {
+			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+			sleep 75
+		}
+		ControlClick, x911 y470,%windowtitle%,,,, Pos NA
+		sleep 1000
+		loop, 30 {
+			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
+			sleep 100
+		}
+		ControlClick, x874 y532,%windowtitle%,,,, Pos NA
+		sleep 1000
+		lootprio()
+		sleep 1000
+	}
+
+	if (curworld = "2") {
+		ControlClick, x544 y515,%windowtitle%,,,, Pos NA
+		sleep 300
+		loop, 9 {
+			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+			sleep 75
+		}
+		ControlClick, x521 y379,%windowtitle%,,,, Pos NA
+		sleep 2000
+		lootprio()
+		sleep 3000
+		ControlClick, x521 y379,%windowtitle%,,,, Pos NA
+		sleep 1000
+		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
+		sleep 2000
+		lootprio()
+		sleep 3000
+		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
+		sleep 1000
+		ControlClick, x780 y653,%windowtitle%,,,, Pos NA
+		sleep 2000
+		lootprio()
+		sleep 3000
+		ControlClick, x780 y653,%windowtitle%,,,, Pos NA
+		sleep 1000
+		loop, 30 {
+			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
+			sleep 100
+		}
+		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
+		sleep 1000
+		lootprio()
+		sleep 1000
+	}
+
+	if (curworld = "3") {
+		ControlClick, x513 y596,%windowtitle%,,,, Pos NA
+		sleep 300
+		loop, 3 {
+			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+			sleep 75
+		}
+		ControlClick, x702 y365,%windowtitle%,,,, Pos NA
+		sleep 2000
+		lootprio()
+		sleep 3000
+		ControlClick, x702 y365,%windowtitle%,,,, Pos NA
+		sleep 1000
+		ControlClick, x954 y621,%windowtitle%,,,, Pos NA
+		sleep 2000
+		lootprio()
+		sleep 3000
+		ControlClick, x954 y621,%windowtitle%,,,, Pos NA
+		sleep 1000
+		ControlClick, x809 y400,%windowtitle%,,,, Pos NA
+		sleep 2000
+		lootprio()
+		sleep 3000
+		ControlClick, x809 y400,%windowtitle%,,,, Pos NA
+		sleep 1000
+		loop, 30 {
+			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
+			sleep 100
+		}
+		ControlClick, x954 y621,%windowtitle%,,,, Pos NA
+		sleep 1000
+		lootprio()
+		sleep 1000
+	}
 }
 
 gettab() {
@@ -459,11 +587,7 @@ scrollHandle() {
 			sleep, 100
 		}
 		scrolls++
-		; if (chestfound = true) {
-			; sleep 20000
-			; lootprio()
-			; chestfound := false
-		; }
+
 		activateautofire()
 		deal := false
 	} else if (ErrorLevel = 1) {
