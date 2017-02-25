@@ -12,10 +12,11 @@ deal := false
 slothonly := false
 chestfound := false
 hasfocus := false
-autolevel := false
 mainscreen := false
+autolevelon := false
 autoabilityon := true
 autolevelon := true
+autocheston := true
 
 world := "unknown"
 currenttab := "unknown"
@@ -243,7 +244,6 @@ checkgame(stat) {
 
 switchworld(curworld) {
 	global
-	logger("[PROGRESS] Switching world")
 	SetTimer, AutoFire, Off
 	if (currenttab != "worldtab") {
 		sleep 1000
@@ -254,6 +254,8 @@ switchworld(curworld) {
 	if (autocheston) {
 		collectchests(curworld)
 	}
+
+	logger("[PROGRESS] Switching world")
 
 	sleep, 3000
 	loop, 15 {
@@ -297,104 +299,108 @@ collectchests(curworld) {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
+		sleep 5000
 		ControlClick, x560 y606,%windowtitle%,,,, Pos NA
-		sleep 300
+		sleep 5000
 		ControlClick, x860 y620,%windowtitle%,,,, Pos NA
-		sleep 2000
+		sleep 5000
 		lootprio()
-		sleep 3000
+		sleep 5000
 		ControlClick, x860 y620,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		loop, 3 {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
 		ControlClick, x864 y451,%windowtitle%,,,, Pos NA
-		sleep 2000
+		sleep 5000
 		lootprio()
-		sleep 3000
+		sleep 5000
 		ControlClick, x864 y451,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		ControlClick, x874 y532,%windowtitle%,,,, Pos NA
-		sleep 2000
+		sleep 5000
 		lootprio()
-		sleep 3000
+		sleep 5000
 		ControlClick, x874 y532,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		loop, 5 {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
+		sleep 5000
 		ControlClick, x911 y470,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		loop, 30 {
 			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
 			sleep 100
 		}
 		ControlClick, x874 y532,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		lootprio()
 		sleep 1000
 	}
 
 	if (curworld = "2") {
 		ControlClick, x544 y515,%windowtitle%,,,, Pos NA
-		sleep 300
+		sleep 5000
 		loop, 9 {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
+		sleep 5000
 		ControlClick, x521 y379,%windowtitle%,,,, Pos NA
-		sleep 2000
+		sleep 5000
 		lootprio()
-		sleep 3000
+		sleep 5000
 		ControlClick, x521 y379,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
-		sleep 2000
+		sleep 5000
 		lootprio()
-		sleep 3000
+		sleep 5000
 		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		ControlClick, x780 y653,%windowtitle%,,,, Pos NA
-		sleep 2000
+		sleep 5000
 		lootprio()
-		sleep 3000
+		sleep 5000
 		ControlClick, x780 y653,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		loop, 30 {
 			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
 			sleep 100
 		}
 		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		lootprio()
 		sleep 1000
 	}
 
 	if (curworld = "3") {
 		ControlClick, x513 y596,%windowtitle%,,,, Pos NA
-		sleep 300
+		sleep 5000
 		loop, 3 {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
+		sleep 5000
 		ControlClick, x702 y365,%windowtitle%,,,, Pos NA
-		sleep 2000
+		sleep 5000
 		lootprio()
-		sleep 3000
+		sleep 5000
 		ControlClick, x702 y365,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		ControlClick, x954 y621,%windowtitle%,,,, Pos NA
-		sleep 2000
+		sleep 5000
 		lootprio()
-		sleep 3000
+		sleep 5000
 		ControlClick, x954 y621,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		ControlClick, x809 y400,%windowtitle%,,,, Pos NA
-		sleep 2000
+		sleep 5000
 		lootprio()
-		sleep 3000
+		sleep 5000
 		ControlClick, x809 y400,%windowtitle%,,,, Pos NA
 		sleep 1000
 		loop, 30 {
@@ -402,7 +408,7 @@ collectchests(curworld) {
 			sleep 100
 		}
 		ControlClick, x954 y621,%windowtitle%,,,, Pos NA
-		sleep 1000
+		sleep 5000
 		lootprio()
 		sleep 1000
 	}
@@ -441,7 +447,7 @@ checkworld() {
 
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
 		if (ErrorLevel = 0) {
-			sleep, 4
+			sleep, 4000
 			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
 			if (ErrorLevel = 0) {
 				world := "1"
@@ -450,13 +456,17 @@ checkworld() {
 		} else {
 			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world2complete.png
 			if (ErrorLevel = 0) {
-				world := "2"
-				logger("[PROGRESS] World 2 is complete.")
-				} else {
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world3complete.png
+				sleep 4000
+				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world2complete.png
 				if (ErrorLevel = 0) {
-					world := "3"
-					logger("[PROGRESS] World 3 is complete.")
+					world := "2"
+					logger("[PROGRESS] World 2 is complete.")
+					} else {
+					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world3complete.png
+					if (ErrorLevel = 0) {
+						world := "3"
+						logger("[PROGRESS] World 3 is complete.")
+					}
 				}
 			}
 		}
@@ -588,10 +598,12 @@ scrollHandle() {
 			ControlClick, x660 y562,%windowtitle%,,,, Pos NA
 			sleep, 100
 		}
-		sleep 18000
-		loop, 5 {
-			ControlClick, x680 y246,%windowtitle%,,,, Pos NA
-			sleep, 100
+		if (graph != "10_Diamonds") {
+			sleep 18000
+			loop, 5 {
+				ControlClick, x680 y246,%windowtitle%,,,, Pos NA
+				sleep, 100
+			}
 		}
 		scrolls++
 
@@ -729,8 +741,8 @@ saveinifunc() {
 		WinGetPos, posx, posy, endposx, endposy, %windowtitle%
 		IniWrite, %posx%, privatesettings.ini, general, browserposx
 		IniWrite, %posy%, privatesettings.ini, general, browserposy
-		IniWrite, %endposx%, privatesettings.ini, general, windowwidth
-		IniWrite, %endposy%, privatesettings.ini, general, windowheight
+		; IniWrite, %endposx%, privatesettings.ini, general, windowwidth
+		; IniWrite, %endposy%, privatesettings.ini, general, windowheight
 	}
 
 	IniWrite, %graphitehost%, privatesettings.ini, general, graphitehost
