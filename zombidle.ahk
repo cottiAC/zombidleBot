@@ -461,12 +461,12 @@ checkworld() {
 				if (ErrorLevel = 0) {
 					world := "2"
 					logger("[PROGRESS] World 2 is complete.")
-					} else {
-					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world3complete.png
-					if (ErrorLevel = 0) {
-						world := "3"
-						logger("[PROGRESS] World 3 is complete.")
-					}
+				}
+			} else {
+				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world3complete.png
+				if (ErrorLevel = 0) {
+					world := "3"
+					logger("[PROGRESS] World 3 is complete.")
 				}
 			}
 		}
