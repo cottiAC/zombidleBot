@@ -331,11 +331,15 @@ collectchests(curworld) {
 		sleep 5000
 		ControlClick, x911 y470,%windowtitle%,,,, Pos NA
 		sleep 5000
+		lootprio()
+		sleep 5000
+		ControlClick, x911 y470,%windowtitle%,,,, Pos NA
+		sleep 5000
 		loop, 30 {
 			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
 			sleep 100
 		}
-		ControlClick, x874 y532,%windowtitle%,,,, Pos NA
+		ControlClick, x842 y521,%windowtitle%,,,, Pos NA
 		sleep 5000
 		lootprio()
 		sleep 1000
