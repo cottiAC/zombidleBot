@@ -22,8 +22,7 @@ world := "unknown"
 currenttab := "unknown"
 checkworldtimer := 0
 upgrademonstertimer := 0
-lootlist := ["tablet", "ring", "potion", "chalice", "king", "lich", "zombie", "bat", "mace", "plague", "specter", "squid", "axe"]
-
+lootarray := []
 
 IniRead, clicks, stats.log, stats, clicks, 0
 IniRead, scrolls, stats.log, stats, scrolls, 0
@@ -62,6 +61,22 @@ IniRead, carl, settings.ini, positions, carl
 IniRead, tombking, settings.ini, positions, tombking
 IniRead, maxbuy, settings.ini, positions, maxbuy
 IniRead, buyskills, settings.ini, positions, buyskills
+
+IniRead, lootpriolist, privatesettings.ini, lootpriolist
+if (lootpriolist) {
+	initcount:=0
+	Loop, parse, lootpriolist, `n
+		initcount++
+	Loop, %initcount% {
+		IniRead, prio%A_Index%, privatesettings.ini, lootpriolist, prio%A_Index%
+		lootarray.Push(prio%A_Index%)
+	}
+} else {
+	lootarray := ["tablet", "ring", "potion", "chalice", "king", "lich", "zombie", "bat", "mace", "plague", "specter", "squid", "axe"]
+	for k, v in lootarray {
+		IniWrite, %v%, privatesettings.ini, lootpriolist, prio%A_Index%
+	}
+}
 
 SetTimer, AutoFire, %interval%
 SetTimer, guiupdate, 1000
@@ -704,7 +719,7 @@ lootprio() {
 	if (ErrorLevel = 0) {
 		knownloot := false
 		logger("[LOOT] found chest loot.")
-		for k, v in lootlist {
+		for k, v in lootarray {
 			quality = 0
 			loop, 3 {
 				quality++
@@ -745,8 +760,8 @@ saveinifunc() {
 		WinGetPos, posx, posy, endposx, endposy, %windowtitle%
 		IniWrite, %posx%, privatesettings.ini, general, browserposx
 		IniWrite, %posy%, privatesettings.ini, general, browserposy
-		; IniWrite, %endposx%, privatesettings.ini, general, windowwidth
-		; IniWrite, %endposy%, privatesettings.ini, general, windowheight
+		IniWrite, %endposx%, privatesettings.ini, general, windowwidth
+		IniWrite, %endposy%, privatesettings.ini, general, windowheight
 	}
 
 	IniWrite, %graphitehost%, privatesettings.ini, general, graphitehost
