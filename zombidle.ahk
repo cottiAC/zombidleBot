@@ -329,7 +329,7 @@ collectchests(curworld) {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
-		sleep 5000
+		sleep 500
 		ControlClick, x560 y606,%windowtitle%,,,, Pos NA
 		sleep 5000
 		ControlClick, x860 y620,%windowtitle%,,,, Pos NA
@@ -358,7 +358,7 @@ collectchests(curworld) {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
-		sleep 5000
+		sleep 500
 		ControlClick, x911 y470,%windowtitle%,,,, Pos NA
 		sleep 5000
 		lootprio()
@@ -382,7 +382,7 @@ collectchests(curworld) {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
-		sleep 5000
+		sleep 500
 		ControlClick, x521 y379,%windowtitle%,,,, Pos NA
 		sleep 5000
 		lootprio()
@@ -418,7 +418,7 @@ collectchests(curworld) {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
-		sleep 5000
+		sleep 500
 		ControlClick, x702 y365,%windowtitle%,,,, Pos NA
 		sleep 5000
 		lootprio()
@@ -581,7 +581,10 @@ upgrademonster() {
 			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
 			sleep 75
 			clicky += 70
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			loop, 2 {
+				ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+				sleep 100
+			}
 		}
 		sleep 75
 
