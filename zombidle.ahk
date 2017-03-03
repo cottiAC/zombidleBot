@@ -72,7 +72,7 @@ if (lootpriolist) {
 		lootarray.Push(prio%A_Index%)
 	}
 } else {
-	lootarray := ["tablet", "ring", "potion", "chalice", "king", "lich", "zombie", "bat", "mace", "plague", "specter", "squid", "axe"]
+	lootarray := ["tablet", "ring", "potion", "chalice", "king", "lich", "zombie", "bat", "mace", "plague", "specter", "squid", "axe", "sword"]
 	for k, v in lootarray {
 		IniWrite, %v%, privatesettings.ini, lootpriolist, prio%A_Index%
 	}
@@ -83,6 +83,8 @@ SetTimer, guiupdate, 1000
 SetTimer, saveini, 60000
 SetTimer, checkforgame, Off
 SetTimer, abilities, %abilitytimer%
+if graphiteenable = true
+	SetTimer, savechests, 600000
 
 abilitycountown := Ceil(abilitytimer / 1000)
 
@@ -179,6 +181,19 @@ guiupdate:
 	}
 	GuiControl,,Status2, Clicks: %clicks%    Scrolls: %scrolls%     Ability countdown: %abilitycountown%
 	GuiControl,,Status4, Upgrading in: %upgrademonstertimer% (%upgradeinterval%) - Check World in:  %checkworldtimer% (%switchworldinterval%) - current tab: %currenttab%
+return
+
+savechests:
+	T2 = %A_NowUTC%
+	T2 -= 19700101000000,seconds
+	for k, v in lootarray {
+		if (%v%_loot >= 1) {
+			temploot := %v%_loot
+			Run %comspec% /c "echo zombidle.chest.%v% %temploot% %T2% | nc.exe %graphitehost% %graphiteport%",, Hide
+		}
+
+		%v%_loot := 0
+	}
 return
 
 ;=============================
@@ -726,6 +741,7 @@ lootprio() {
 				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, *50 imgs/lootprio/%v%_%quality%.png
 				if (ErrorLevel = 0) {
 					logger("[LOOT] " . v . "_" . quality . " found.")
+					%v%_loot++
 					clickx := FoundX - posx + 60
 					clicky := FoundY - posy + 240
 					ControlClick, x%clickx% y%clicky%,%windowtitle%,,,, Pos NA
@@ -736,7 +752,6 @@ lootprio() {
 		}
 		if (knownloot = false) {
 			logger("[LOOT] could not identify chest loot. Taking the first item")
-			pause
 		}
 	}
 }
