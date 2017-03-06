@@ -71,9 +71,7 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 
 ## Ideas for later releases
 * Reset World
-* open chests on maps
-* identify and prioritize loot from chests
-* craft items
+* craft items (waiting for the upcoming cook book)
 
 ## Thanks
 Thanks to kojaktsl and Lachhh for this awesome game. Keep up the good work.
