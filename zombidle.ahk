@@ -45,6 +45,8 @@ IniRead, graphiteenable, privatesettings.ini, general, graphiteenable, false
 IniRead, graphitehost, privatesettings.ini, general, graphitehost, 127.0.0.1
 IniRead, graphiteport, privatesettings.ini, general, graphiteport, 2003
 
+IniRead, portal, privatesettings.ini, game, portal, 1
+
 IniRead, idletime, privatesettings.ini, timer, idletime, 60000
 IniRead, interval, privatesettings.ini, timer, interval, 50
 IniRead, abilitytimer, privatesettings.ini, timer, abilitytimer, 325000
@@ -112,6 +114,7 @@ Gui, Add, Text,vstatus2 x12 w400,
 Gui, Add, Text,vstatus3 x12 w400,
 Gui, Add, Text,vstatus4 x12 w400,
 Gui, Add, Button, x12 w100 gPauseButton Default, pause Bot
+Gui, Add, Button, xp+300 w100 gResetButton Default, Reset World
 Gui, Color, daffb4
 Gui, Show, %guipos% NoActivate, Zombidle Status
 
@@ -272,16 +275,17 @@ checkgame(stat) {
 	}
 }
 
-switchworld(curworld) {
+switchworld(curworld, reset:=false) {
 	global
 	SetTimer, AutoFire, Off
+	currenttab := gettab()
 	if (currenttab != "worldtab") {
 		sleep 1000
 		ControlClick, %worldtab% ,%windowtitle%,,,, Pos NA
 		sleep 1000
 	}
 
-	if (autocheston) {
+	if (autocheston and curworld != "new") {
 		collectchests(curworld)
 	}
 
@@ -294,6 +298,12 @@ switchworld(curworld) {
 	}
 
 	sleep 1000
+
+	if (curworld = "new") {
+		ControlClick, x600 y670,%windowtitle%,,,, Pos NA
+		sleep 1000
+		ControlClick, x400 y400,%windowtitle%,,,, Pos NA
+	}
 
 	if (curworld = "1") {
 		ControlClick, x670 y515,%windowtitle%,,,, Pos NA
@@ -310,9 +320,37 @@ switchworld(curworld) {
 		sleep 1000
 		ControlClick, x600 y300,%windowtitle%,,,, Pos NA
 	}
-	sleep 1000
-	ControlClick, x700 y530,%windowtitle%,,,, Pos NA
-	sleep 500
+	if (curworld = "4") {
+		if (reset = false) {
+			ControlClick, x600 y670,%windowtitle%,,,, Pos NA
+			sleep 1000
+			ControlClick, x690 y560,%windowtitle%,,,, Pos NA
+		} else {
+			loop, 5 {
+				ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+				sleep 75
+			}
+			ControlClick, x940 y460,%windowtitle%,,,, Pos NA
+			sleep 1000
+		}
+	}
+
+	if (reset = true) {
+		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/reset.png
+		if (ErrorLevel = 0) {
+			logger("[PROGRESS] Resetting world")
+			ControlClick, x250 y700,%windowtitle%,,,, Pos NA
+			sleep 1000
+			ControlClick, x550 y520,%windowtitle%,,,, Pos NA
+			sleep 5000
+			switchworld("new")
+		}
+	} else {
+		sleep 1000
+		ControlClick, x700 y530,%windowtitle%,,,, Pos NA
+		sleep 500
+	}
+
 	activateautofire()
 }
 
@@ -446,6 +484,33 @@ collectchests(curworld) {
 		lootprio()
 		sleep 1000
 	}
+
+	if (curworld = "4") {
+		loop, 5 {
+			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+			sleep 75
+		}
+		sleep 500
+		ControlClick, x520 y460,%windowtitle%,,,, Pos NA
+		sleep 5000
+		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
+		sleep 5000
+		lootprio()
+		sleep 5000
+		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
+		sleep 5000
+		ControlClick, x960 y650,%windowtitle%,,,, Pos NA
+		sleep 5000
+		lootprio()
+		sleep 5000
+		ControlClick, x960 y650,%windowtitle%,,,, Pos NA
+		sleep 5000
+		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
+		sleep 5000
+		lootprio()
+		sleep 1000
+	}
+
 }
 
 gettab() {
@@ -787,6 +852,8 @@ saveinifunc() {
 	IniWrite, %graphiteenable%, privatesettings.ini, general, graphiteenable
 	IniWrite, "%windowtitle%", privatesettings.ini, general, windowtitle
 
+	IniWrite, %portal%, privatesettings.ini, game, portal
+
 	IniWrite, %idletime%, privatesettings.ini, timer, idletime
 	IniWrite, %interval%, privatesettings.ini, timer, interval
 	IniWrite, %abilitytimer%, privatesettings.ini, timer, abilitytimer
@@ -812,6 +879,11 @@ PauseButton:
 		logger("[GAME] Resuming")
 
 	}
+return
+
+ResetButton:
+	numportal := Ceil(portal / 2)
+	switchworld(numportal, true)
 return
 
 clicker:
