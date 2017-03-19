@@ -1,23 +1,23 @@
 # zombidleBot
-Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
+Autohotkey project for idle game [Zombidle](http://www.zombidle.de)
 
 ## Overview
-* [Getting Started and Upgrading to latest Bot version] (#getting-started)
-* [Features] (#features)
-* [Limitation] (#limitation)
-* [Graphite Setup] (#graphite-instruction-optional)
-* [Known Issues] (#known-issues)
-* [Later releases] (#ideas-for-later-releases)
-* [Thanks] (#thanks)
+* [Getting Started and Upgrading to latest Bot version](#getting-started)
+* [Features](#features)
+* [Limitation](#limitation)
+* [Graphite Setup](#graphite-instruction-optional)
+* [Known Issues](#known-issues)
+* [Later releases](#ideas-for-later-releases)
+* [Thanks](#thanks)
 
 ## Getting Started
-* Install  [Autohotkey v1.1.*] (https://autohotkey.com/)
-* Download [latest zombildeBot release] (https://github.com/cottiAC/zombidleBot/releases/latest) and unpack
-* Open a seperate Firefox window (<kbd>Ctrl+N</kbd> in FF) and go to [http://www.zombidle.de] (http://www.zombidle.de)
+* Install  [Autohotkey v1.1.*](https://autohotkey.com/)
+* Download [latest zombildeBot release](https://github.com/cottiAC/zombidleBot/releases/latest) and unpack
+* Open a seperate Firefox window (<kbd>Ctrl+N</kbd> in FF) and go to [http://www.zombidle.de](http://www.zombidle.de)
 * Start zombidle.ahk 
 
 ### Upgrading to latest version
-* Download [latest zombildeBot release] (https://github.com/cottiAC/zombidleBot/releases/latest) and unpack
+* Download [latest zombildeBot release](https://github.com/cottiAC/zombidleBot/releases/latest) and unpack
 * Copy over following files from old release, to restore settings and progress:
   * privatesettings.ini
   * stats.log
@@ -44,14 +44,14 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 * if you use another browser window, the bot will not click to avoid take away focus
 * in order to find scrolls, the browser windows must be visible
 * Bot will switch from world 2 to 1, 1 to 3, 3 to 4. So you need to start with world 2 
-* you need [Autohotkey v1.1.*] (https://autohotkey.com/) to run the script
+* you need [Autohotkey v1.1.*](https://autohotkey.com/) to run the script
 
 
 ## Graphite Instruction (optional)
-* [Install Graphite] (https://graphite.readthedocs.io/en/latest/install.html#id2)
+* [Install Graphite](https://graphite.readthedocs.io/en/latest/install.html#id2)
 * configure your Graphite host and port in privatesettings.ini (privatesettings.ini will be created after first Bot start)
 * change **graphiteenable** to true in your privatesettings.ini
-* Download netcat (nc.exe) from [netcat Homepage] (http://netcat.sourceforge.net/) or use the [cygwin netcat] (https://cygwin.com/) and include it to your PATH variable
+* Download netcat (nc.exe) from [netcat Homepage](http://netcat.sourceforge.net/) or use the [cygwin netcat](https://cygwin.com/) and include it to your PATH variable
 * structure of whisper paths are `zombidle.loot.%graph%`. %graph% can be:
   * x4_Skull
   * 5_Level
@@ -62,7 +62,7 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
   * Chest
   * NA
 
-* you can use [Grafana] (http://grafana.org/) to visualize it
+* you can use [Grafana](http://grafana.org/) to visualize it
 
 ## Known issues
 * When game is paused, ability timer can go negative until next activation
@@ -71,7 +71,6 @@ Autohotkey project for idle game [Zombidle] (http://www.zombidle.de)
 
 ## Ideas for later releases
 * Reset World
-* craft items (waiting for the upcoming cook book)
 
 ## Thanks
 Thanks to kojaktsl and Lachhh for this awesome game. Keep up the good work.
