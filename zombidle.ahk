@@ -539,7 +539,7 @@ checkworld() {
 		mainscreen := false
 	}
 
-	if (checkworldtimer = switchworldinterval) {
+	if (checkworldtimer >= switchworldinterval) {
 		checkworldtimer := 0
 		world := "unknown"
 		currenttab := gettab()
@@ -592,7 +592,7 @@ upgrademonster() {
 		}
 	}
 
-	if (upgrademonstertimer = upgradeinterval) {
+	if (upgrademonstertimer >= upgradeinterval) {
 		upgrademonstertimer := 0
 		SetTimer, AutoFire, Off
 
