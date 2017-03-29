@@ -420,7 +420,6 @@ collectchests(curworld) {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
-		sleep 500
 		ControlClick, x521 y379,%windowtitle%,,,, Pos NA
 		sleep 5000
 		lootprio()
@@ -456,7 +455,6 @@ collectchests(curworld) {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
-		sleep 500
 		ControlClick, x702 y365,%windowtitle%,,,, Pos NA
 		sleep 5000
 		lootprio()
@@ -490,7 +488,6 @@ collectchests(curworld) {
 			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
 			sleep 75
 		}
-		sleep 500
 		ControlClick, x520 y460,%windowtitle%,,,, Pos NA
 		sleep 5000
 		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
@@ -506,6 +503,22 @@ collectchests(curworld) {
 		ControlClick, x960 y650,%windowtitle%,,,, Pos NA
 		sleep 5000
 		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
+		sleep 5000
+		lootprio()
+		sleep 5000
+		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
+		sleep 1000
+		loop, 6 {
+			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+			sleep 75
+		}
+		ControlClick, x900 y400,%windowtitle%,,,, Pos NA
+		sleep 5000
+		loop, 30 {
+			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
+			sleep 100
+		}
+		ControlClick, x700 y520,%windowtitle%,,,, Pos NA
 		sleep 5000
 		lootprio()
 		sleep 1000
@@ -566,6 +579,12 @@ checkworld() {
 				if (ErrorLevel = 0) {
 					world := "3"
 					logger("[PROGRESS] World 3 is complete.")
+				} else {
+					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world4complete.png
+					if (ErrorLevel = 0) {
+						world := "4"
+						logger("[PROGRESS] World 4 is complete.")
+					}
 				}
 			}
 		}
