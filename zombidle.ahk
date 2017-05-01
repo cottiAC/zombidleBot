@@ -137,7 +137,8 @@ return
 
 abilities:
 	Critical
-	if (!autoabilityon) {
+	abilitycountown := Ceil(abilitytimer / 1000)
+	if (!autoabilityon or pauser = true) {
 		return
 	}
 
@@ -164,10 +165,9 @@ abilities:
 			sleep, 50
 			ControlSend,, 7, %windowtitle%
 		}
-		logger("[PROGRESS] Starte all abilities")
+		logger("[PROGRESS] Start all abilities")
 		slothonly := true
 	}
-	abilitycountown := Ceil(abilitytimer / 1000)
 return
 
 checkforgame:
@@ -179,9 +179,7 @@ saveini:
 return
 
 guiupdate:
-	if (pauser = false) {
-		abilitycountown--
-	}
+	abilitycountown--
 	GuiControl,,Status2, Clicks: %clicks%    Scrolls: %scrolls%     Ability countdown: %abilitycountown%
 	GuiControl,,Status4, Upgrading in: %upgrademonstertimer% (%upgradeinterval%) - Check World in:  %checkworldtimer% (%switchworldinterval%) - current tab: %currenttab%
 return
@@ -331,6 +329,20 @@ switchworld(curworld, reset:=false) {
 				sleep 75
 			}
 			ControlClick, x940 y460,%windowtitle%,,,, Pos NA
+			sleep 1000
+		}
+	}
+	if (curworld = "5") {
+		if (reset = false) {
+			ControlClick, x600 y670,%windowtitle%,,,, Pos NA
+			sleep 1000
+			ControlClick, x690 y560,%windowtitle%,,,, Pos NA
+		} else {
+			; loop, 5 {
+				; ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+				; sleep 75
+			; }
+			ControlClick, x880 y700,%windowtitle%,,,, Pos NA
 			sleep 1000
 		}
 	}
@@ -582,8 +594,12 @@ checkworld() {
 				} else {
 					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world4complete.png
 					if (ErrorLevel = 0) {
-						world := "4"
-						logger("[PROGRESS] World 4 is complete.")
+						sleep 4000
+						ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world4complete.png
+						if (ErrorLevel = 0) {
+							world := "4"
+							logger("[PROGRESS] World 4 is complete.")
+						}
 					}
 				}
 			}
@@ -884,7 +900,6 @@ saveinifunc() {
 PauseButton:
 	if (pauser = false) {
 		SetTimer, AutoFire, Off
-		SetTimer, abilities, Off
 		pauser := true
 		Gui, Color, EEAA99
 		logger("[GAME] Pause button pressed")
