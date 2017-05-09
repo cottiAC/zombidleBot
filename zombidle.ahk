@@ -413,16 +413,16 @@ collectchests(curworld) {
 		sleep 5000
 		lootprio()
 		sleep 5000
-		ControlClick, x911 y470,%windowtitle%,,,, Pos NA
-		sleep 5000
-		loop, 30 {
-			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
-			sleep 100
-		}
-		ControlClick, x842 y521,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 1000
+		; ControlClick, x911 y470,%windowtitle%,,,, Pos NA
+		; sleep 5000
+		; loop, 30 {
+			; ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
+			; sleep 100
+		; }
+		; ControlClick, x842 y521,%windowtitle%,,,, Pos NA
+		; sleep 5000
+		; lootprio()
+		; sleep 1000
 	}
 
 	if (curworld = "2") {
@@ -448,16 +448,20 @@ collectchests(curworld) {
 		sleep 5000
 		lootprio()
 		sleep 5000
-		ControlClick, x780 y653,%windowtitle%,,,, Pos NA
-		sleep 5000
-		loop, 30 {
-			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
-			sleep 100
-		}
 		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
 		sleep 5000
+		ControlClick, x780 y653,%windowtitle%,,,, Pos NA
+		sleep 5000
 		lootprio()
-		sleep 1000
+		; sleep 5000
+		; ControlClick, x904 y636,%windowtitle%,,,, Pos NA
+		; sleep 5000
+		; loop, 30 {
+			; ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
+			; sleep 100
+		; }
+		; ControlClick, x904 y636,%windowtitle%,,,, Pos NA
+		; sleep 5000
 	}
 
 	if (curworld = "3") {
@@ -483,16 +487,16 @@ collectchests(curworld) {
 		sleep 5000
 		lootprio()
 		sleep 5000
-		ControlClick, x809 y400,%windowtitle%,,,, Pos NA
-		sleep 1000
-		loop, 30 {
-			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
-			sleep 100
-		}
-		ControlClick, x954 y621,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 1000
+		; ControlClick, x809 y400,%windowtitle%,,,, Pos NA
+		; sleep 1000
+		; loop, 30 {
+			; ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
+			; sleep 100
+		; }
+		; ControlClick, x954 y621,%windowtitle%,,,, Pos NA
+		; sleep 5000
+		; lootprio()
+		; sleep 1000
 	}
 
 	if (curworld = "4") {
@@ -518,22 +522,22 @@ collectchests(curworld) {
 		sleep 5000
 		lootprio()
 		sleep 5000
-		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
-		sleep 1000
-		loop, 6 {
-			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
-			sleep 75
-		}
-		ControlClick, x900 y400,%windowtitle%,,,, Pos NA
-		sleep 5000
-		loop, 30 {
-			ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
-			sleep 100
-		}
-		ControlClick, x700 y520,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 1000
+		; ControlClick, x670 y670,%windowtitle%,,,, Pos NA
+		; sleep 1000
+		; loop, 6 {
+			; ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
+			; sleep 75
+		; }
+		; ControlClick, x900 y400,%windowtitle%,,,, Pos NA
+		; sleep 5000
+		; loop, 30 {
+			; ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
+			; sleep 100
+		; }
+		; ControlClick, x700 y520,%windowtitle%,,,, Pos NA
+		; sleep 5000
+		; lootprio()
+		; sleep 1000
 	}
 
 }
@@ -815,6 +819,7 @@ identifiyloot() {
 								logger("[LOOT] **** ERROR **** - could not identify loot")
 								TrayTip, WTF Loot, WTF Loot, 10, 1
 								graph := "NA"
+								pause
 							}
 						}
 					}
