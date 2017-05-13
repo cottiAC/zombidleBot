@@ -819,7 +819,6 @@ identifiyloot() {
 								logger("[LOOT] **** ERROR **** - could not identify loot")
 								TrayTip, WTF Loot, WTF Loot, 10, 1
 								graph := "NA"
-								pause
 							}
 						}
 					}
