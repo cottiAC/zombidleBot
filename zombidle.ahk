@@ -6,6 +6,8 @@ SetTitleMatchMode, 3
 SendMode Input
 SysGet, workArea, Monitor, 2
 
+fullcurrentversion := "2.0.0"
+
 exitThread := false
 pauser := false
 deal := false
@@ -79,6 +81,8 @@ if (lootpriolist) {
 		IniWrite, %v%, privatesettings.ini, lootpriolist, prio%A_Index%
 	}
 }
+
+checkupdate()
 
 SetTimer, AutoFire, %interval%
 SetTimer, guiupdate, 1000
@@ -785,7 +789,7 @@ identifiyloot() {
 			minuslevel++
 			graph := "5_Level"
 		} else {
-			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/crafttime.png
+			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/craftboost.png
 			if (ErrorLevel = 0) {
 				logger("[LOOT] reduced 4h crafting time")
 				crafttime++
@@ -901,6 +905,54 @@ saveinifunc() {
 	IniWrite, %upgradecarlinterval%, privatesettings.ini, timer, upgradecarlinterval
 }
 
+checkupdate() {
+	global
+	logger("[GAME] Checking for Bot Updates on Github")
+	StringSplit, partcurrentversion, fullcurrentversion, ".", .
+
+	url:="https://github.com/cottiAC/zombidleBot/releases/latest"
+	fileName := "tmpversion.txt"
+
+	UrlDownloadToFile, %url%, %A_ScriptDir%\%fileName%
+	If (!ErrorLevel) {
+		FileRead, html, %A_ScriptDir%\%fileName%
+		FileDelete, %A_ScriptDir%\%fileName%
+		Loop , parse , html , `n
+		{
+			line := A_LoopField
+			if line contains <title>
+				RegExMatch(line, "Release v(.*) ", latestversion)
+		}
+
+		fulllatestversion := RegExReplace(latestversion1, " .*", "")
+		StringSplit, partlatestversion, fulllatestversion, ".", .
+		logger("[GAME] Current Bot version: " . fullcurrentversion)
+		logger("[GAME] Latest Bot version on Github: " . fulllatestversion)
+
+		if (partlatestversion1 > partcurrentversion1 or partlatestversion2 > partcurrentversion2 or partlatestversion3 > partcurrentversion3) {
+					logger("[GAME] New release available!")
+					Gui, UpdateNotification:Font,, Consolas
+					Gui, UpdateNotification:Add, GroupBox, w300 h80 cGreen, Update available!
+					Gui, UpdateNotification:Add, Text, x20 yp+20, Installed version:
+					Gui, UpdateNotification:Add, Text, x150 yp+0,  %fullcurrentversion%
+					Gui, UpdateNotification:Add, Text, x20 y+0, Latest version:
+					Gui, UpdateNotification:Add, Text, x150 yp+0,  %fulllatestversion%
+					Gui, UpdateNotification:Add, Link, x+20 yp+0 cBlue, <a href="%url%">Download it here</a>
+					Gui, UpdateNotification:Add, Button, gCloseUpdateWindow, Close
+					Gui, UpdateNotification:Show, w320 xCenter yCenter, Update
+					WinWaitClose, Update
+		} else {
+			logger("[GAME] No new release version found")
+		}
+	} else {
+		logger("[GAME] Could not download version info from github")
+	}
+}
+
+;=============================
+;=== Buttons and Controlls ===
+;=============================
+
 PauseButton:
 	if (pauser = false) {
 		SetTimer, AutoFire, Off
@@ -923,6 +975,10 @@ ResetButton:
 	numportal := Ceil(portal / 2)
 	switchworld(numportal, true)
 return
+
+CloseUpdateWindow:
+	Gui, Cancel
+Return
 
 clicker:
 	GuiControlGet, autoclickeron
