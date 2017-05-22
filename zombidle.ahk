@@ -448,13 +448,13 @@ collectchests(curworld) {
 		sleep 5000
 		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
 		sleep 5000
-		ControlClick, x780 y653,%windowtitle%,,,, Pos NA
+		ControlClick, x850 y580,%windowtitle%,,,, Pos NA
 		sleep 5000
 		lootprio()
 		sleep 5000
 		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
 		sleep 5000
-		ControlClick, x780 y653,%windowtitle%,,,, Pos NA
+		ControlClick, x850 y580,%windowtitle%,,,, Pos NA
 		sleep 5000
 		lootprio()
 		; sleep 5000
