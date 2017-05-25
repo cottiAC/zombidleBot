@@ -6,7 +6,7 @@ SetTitleMatchMode, 3
 SendMode Input
 SysGet, workArea, Monitor, 2
 
-fullcurrentversion := "2.0.0"
+fullcurrentversion := "2.0.1"
 
 exitThread := false
 pauser := false
