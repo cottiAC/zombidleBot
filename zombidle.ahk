@@ -40,7 +40,7 @@ IniRead, chest3, stats.log, loot, chest3, 0
 IniRead, guipos, privatesettings.ini, general, guipos, x0 y0
 IniRead, browserposx, privatesettings.ini, general, browserposx, 0
 IniRead, browserposy, privatesettings.ini, general, browserposy, 0
-IniRead, windowtitle, privatesettings.ini, general, windowtitle, Zombidle! - Mozilla Firefox
+IniRead, windowtitle, privatesettings.ini, general, windowtitle, Zombidle
 IniRead, windowwidth, privatesettings.ini, general, windowwidth, 995
 IniRead, windowheight, privatesettings.ini, general, windowheight, 760
 IniRead, graphiteenable, privatesettings.ini, general, graphiteenable, false
@@ -207,7 +207,7 @@ return
 
 generalLoop() {
 	global
-	WinMove, %windowtitle%,, %browserposx%, %browserposy%, %windowwidth%, %windowheight%
+	; WinMove, %windowtitle%,, %browserposx%, %browserposy%, %windowwidth%, %windowheight%
 	logger("[GAME] GeneralLoop started")
 	loop {
 		checkgame("looper")
