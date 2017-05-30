@@ -1,6 +1,8 @@
 # zombidleBot
 Autohotkey project for idle game [Zombidle](http://www.zombidle.de)
 
+## Working on a Steam Bot version right now. Stay tuned
+
 ## Overview
 * [Getting Started and Upgrading to latest Bot version](#getting-started)
 * [Features](#features)
