@@ -219,29 +219,15 @@ generalLoop() {
 		WinGetPos, posx, posy, endposx, endposy, %windowtitle%
 		MouseGetPos, , , id, control
 		WinGetClass, class, ahk_id %id%
-		upgrademonster()
-		checkworld()
-		scrollHandle()
+		WinGetTitle, title, ahk_id %id%
 
-		if (control = "GeckoFPSandboxChildWindow1") {
+		if (class = "ApolloRuntimeContentWindow" and title = "Zombidle") {
 			if (A_TimeIdle>=idletime) {
 				GuiControl,,Status, Active! Mouse pointer in zombidle window but inactive for more than %idletime% seconds.
 				hasfocus := false
 				activateautofire()
 			} else {
 				GuiControl,,Status, Inactive! Mouse pointer in zombidle window.
-				hasfocus := true
-				SetTimer, AutoFire, Off
-			}
-		} else if (class = "MozillaWindowClass" or class = "MozillaDropShadowWindowClass" or class = "MozillaDialogClass") {
-			if (A_TimeIdle>=idletime) {
-				activateautofire()
-				GuiControl,,Status, Active! Mouse pointer in some browser window but inactive for more than %idletime% seconds.
-				hasfocus := false
-			} else {
-				SetTimer, AutoFire, Off
-				waittime := Ceil(A_TimeIdle / 1000)
-				GuiControl,,Status, Inactive! Mouse pointer in some browser window. Idle since: %waittime% seconds.
 				hasfocus := true
 				SetTimer, AutoFire, Off
 			}
@@ -252,6 +238,9 @@ generalLoop() {
 		}
 		if (hasfocus = false) {
 			lootprio()
+			upgrademonster()
+			checkworld()
+			scrollHandle()
 		}
 		sleep 1000
 	}
