@@ -61,7 +61,6 @@ IniRead, worldtab, settings.ini, positions, worldtab
 IniRead, monstertab, settings.ini, positions, monstertab
 IniRead, scrollright, settings.ini, positions, scrollright
 IniRead, scrollleft, settings.ini, positions, scrollleft
-IniRead, carl, settings.ini, positions, carl
 IniRead, tombking, settings.ini, positions, tombking
 IniRead, maxbuy, settings.ini, positions, maxbuy
 IniRead, buyskills, settings.ini, positions, buyskills
@@ -618,9 +617,14 @@ upgrademonster() {
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
 		if (ErrorLevel = 0) {
 			logger("[PROGRESS] Leveling Carl.")
+			SetTimer, AutoFire, Off
+			sleep 1000
 			clickx := FoundX - posx + 0
 			clicky := FoundY - posy + 0
 			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			sleep 1000
+			activateautofire()
+
 		}
 	}
 
