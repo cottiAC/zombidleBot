@@ -134,6 +134,7 @@ return
 
 AutoFire:
 	Critical
+	SetControlDelay -1
 	ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
 	clicks++
 return
@@ -147,26 +148,27 @@ abilities:
 
 	if (slothonly = true) {
 		loop, 4 {
-			ControlSend,, 1, %windowtitle%
+			ControlSend,, {1 down}{1 up}, %windowtitle%
 			sleep, 50
 		}
 		logger("[PROGRESS] Start only Sloths Form")
 		slothonly := false
 	} else {
 		loop, 4 {
-			ControlSend,, 1, %windowtitle%
+			ControlSend,, {1 down}{1 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 2, %windowtitle%
+			ControlSend,, {2 down}{2 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 3, %windowtitle%
+			ControlSend,, {3 down}{3 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 4, %windowtitle%
+			ControlSend,, {4 down}{4 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 5, %windowtitle%
+			ControlSend,, {5 down}{5 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 6, %windowtitle%
+			ControlSend,, {6 down}{6 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 7, %windowtitle%
+			ControlSend,, {7 down}{7 up}, %windowtitle%
+			sleep, 50
 		}
 		logger("[PROGRESS] Start all abilities")
 		slothonly := true
