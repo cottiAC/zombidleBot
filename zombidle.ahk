@@ -1,6 +1,7 @@
 #SingleInstance, Force
 #NoEnv
-
+#Include GDIP.ahk
+#Include Gdip_ImageSearch.ahk
 CoordMode, Pixel, Screen
 SetTitleMatchMode, 3
 SendMode Input
@@ -666,8 +667,6 @@ upgrademonster() {
 
 		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
 		sleep 250
-
-		sleep 75
 
 		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
 		if (ErrorLevel = 0) {
