@@ -1,7 +1,7 @@
 #SingleInstance, Force
 #NoEnv
-#Include GDIP.ahk
-#Include Gdip_ImageSearch.ahk
+#Include %A_ScriptDir%\Gdip_all.ahk
+#Include %A_ScriptDir%\Gdip_ImageSearch.ahk
 CoordMode, Pixel, Screen
 SetTitleMatchMode, 3
 SendMode Input
@@ -126,7 +126,7 @@ Gui, Color, daffb4
 Gui, Show, %guipos% NoActivate, Zombidle Status
 
 logger("[GAME] Bot initialized. Start generalLoop")
-OnExit("saveinifunc")
+OnExit("exitfunc")
 
 generalLoop()
 
@@ -213,6 +213,11 @@ generalLoop() {
 	global
 	; WinMove, %windowtitle%,, %browserposx%, %browserposy%, %windowwidth%, %windowheight%
 	logger("[GAME] GeneralLoop started")
+	If !pToken := Gdip_Startup() {
+		MsgBox, 48, gdiplus error!, Gdiplus failed to start. Please ensure you have gdiplus on your system
+		logger("[GAME] gdiplus error!, Gdiplus failed to start")
+		ExitApp
+	}
 	loop {
 		checkgame("looper")
 		if (exitThread) OR (pauser) {
@@ -244,7 +249,7 @@ generalLoop() {
 			lootprio()
 			upgrademonster()
 			checkworld()
-			; scrollHandle()
+			scrollHandle()
 		}
 		sleep 1000
 	}
@@ -345,8 +350,8 @@ switchworld(curworld, reset:=false) {
 	}
 
 	if (reset = true) {
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/reset.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/reset.png")
+		if (clickpos != -1) {
 			logger("[PROGRESS] Resetting world")
 			ControlClick, x250 y700,%windowtitle%,,,, Pos NA
 			sleep 1000
@@ -541,12 +546,12 @@ collectchests(curworld) {
 
 gettab() {
 	global
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/monstertab.png
-	if (ErrorLevel = 0) {
+	clickpos := imagesearcher("imgs/monstertab.png")
+	if (clickpos != -1) {
 		tab := "monstertab"
 	} else {
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/worldtab.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/worldtab.png")
+		if (clickpos != -1) {
 			tab := "worldtab"
 		} else {
 			tab := "unknown"
@@ -558,8 +563,8 @@ gettab() {
 checkworld() {
 	global
 	checkworldtimer++
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/tohell.png
-	if (ErrorLevel = 0) {
+	clickpos := imagesearcher("imgs/tohell.png")
+	if (clickpos != -1) {
 		mainscreen := true
 	} else {
 		mainscreen := false
@@ -570,34 +575,34 @@ checkworld() {
 		world := "unknown"
 		currenttab := gettab()
 
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/world1complete.png")
+		if (clickpos != -1) {
 			sleep, 4000
-			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
-			if (ErrorLevel = 0) {
+			clickpos := imagesearcher("imgs/world1complete.png")
+			if (clickpos != -1) {
 				world := "1"
 				logger("[PROGRESS] World 1 is complete.")
 			}
 		} else {
-			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world2complete.png
-			if (ErrorLevel = 0) {
+			clickpos := imagesearcher("imgs/world2complete.png")
+			if (clickpos != -1) {
 				sleep 4000
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world2complete.png
-				if (ErrorLevel = 0) {
+				clickpos := imagesearcher("imgs/world2complete.png")
+				if (clickpos != -1) {
 					world := "2"
 					logger("[PROGRESS] World 2 is complete.")
 				}
 			} else {
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world3complete.png
-				if (ErrorLevel = 0) {
+				clickpos := imagesearcher("imgs/world3complete.png")
+				if (clickpos != -1) {
 					world := "3"
 					logger("[PROGRESS] World 3 is complete.")
 				} else {
-					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world4complete.png
-					if (ErrorLevel = 0) {
+					clickpos := imagesearcher("imgs/world4complete.png")
+					if (clickpos != -1) {
 						sleep 4000
-						ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world4complete.png
-						if (ErrorLevel = 0) {
+						clickpos := imagesearcher("imgs/world4complete.png")
+						if (clickpos != -1) {
 							world := "4"
 							logger("[PROGRESS] World 4 is complete.")
 						}
@@ -619,14 +624,14 @@ upgrademonster() {
 	}
 
 	if (Mod(upgrademonstertimer, upgradecarlinterval) = 0) {
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/upgrade.png")
+		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Carl.")
 			SetTimer, AutoFire, Off
 			sleep 1000
-			clickx := FoundX - posx + 0
-			clicky := FoundY - posy + 0
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			; clickx := FoundX - posx + 0
+			; clicky := FoundY - posy + 0
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 			sleep 1000
 			activateautofire()
 
@@ -647,14 +652,14 @@ upgrademonster() {
 			sleep 500
 		}
 
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/maxbuy.png
-		if (ErrorLevel != 0) {
+		clickpos := imagesearcher("imgs/maxbuy.png")
+		if (clickpos = -1) {
 			logger("[PROGRESS] Set buy size to MAX")
 			loop, 10 {
 				ControlClick, %maxbuy% ,%windowtitle%,,,, Pos NA
 				sleep, 100
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/maxbuy.png
-			} until (ErrorLevel = 0)
+				clickpos := imagesearcher("imgs/maxbuy.png")
+			} until (clickpos != -1)
 		}
 
 		loop, 15 {
@@ -668,39 +673,39 @@ upgrademonster() {
 		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
 		sleep 250
 
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/upgrade.png")
+		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Carl.")
-			clickx := FoundX - posx + 0
-			clicky := FoundY - posy + 0
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			; clickx := FoundX - posx + 0
+			; clicky := FoundY - posy + 0
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 		}
 		sleep 75
 
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgradetombking.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/upgradetombking.png")
+		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Tomb King.")
-			clickx := FoundX - posx + 0
-			clicky := FoundY - posy + 160
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			; clickx := FoundX - posx + 0
+			; TODO ! clicky := FoundY - posy + 160
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 			sleep 75
-			clicky += 70
+			; TODO ! clicky += 70
 			loop, 2 {
-				ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+				ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 				sleep 100
 			}
 		}
 		sleep 75
 
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgradesquid.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/upgradesquid.png")
+		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Squid.")
-			clickx := FoundX - posx + 0
-			clicky := FoundY - posy + 160
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			; clickx := FoundX - posx + 0
+			; TODO ! clicky := FoundY - posy + 160
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 			sleep 75
-			clicky += 70
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			; TODO ! clicky += 70
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 		}
 
 		activateautofire()
@@ -712,27 +717,32 @@ scrollHandle() {
 	if (!autoscrollon) {
 		return
 	}
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/thedeal.png
-	if (ErrorLevel = 0) {
+	clickpos := imagesearcher("imgs/thedeal.png")
+	if (clickpos != -1) {
 		logger("[LOOT] Found deal without clicking scroll")
 		deal := true
 	}
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/scroll.png
-	if (ErrorLevel = 0 or deal = true) {
+	clickpos := imagesearcher("imgs/scroll.png")
+	if (clickpos != -1 or deal = true) {
 		SetTimer, AutoFire, Off
 		if (deal = false) {
 			logger("[LOOT] Scroll found")
 			clickx := FoundX - posx + 20
 			clicky := FoundY - posy + 20
-			loop {
-				ControlClick, x%clickx% y%clicky%,%windowtitle%,,,, Pos NA
-				sleep, 100
-				logger("[LOOT] Clicking scroll")
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/scroll.png
-				if (ErrorLevel = 1) {
-					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/scrollinactive.png
-				}
-			} until (ErrorLevel = 1)
+			; loop {
+				; ControlClick, %clickpos%,%windowtitle%,,,, Pos NA
+				; sleep, 100
+				; logger("[LOOT] Clicking scroll")
+				; clickpos := imagesearcher("imgs/scroll.png")
+				; if (clickpos = -1) {
+					; clickpos := imagesearcher("imgs/scrollinactive.png")
+				; }
+			; } until (clickpos = -1)
+
+			loop, 5 {
+				ControlClick, %clickpos%,%windowtitle%,,,, Pos NA
+				sleep 100
+			}
 			sleep 2000
 		}
 		identifiyloot()
@@ -773,44 +783,44 @@ identifiyloot() {
 	T = %A_NowUTC%
 	T -= 19700101000000,seconds
 	graph := "null"
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/skullmultiplier.png
-	if (ErrorLevel = 0) {
+	clickpos := imagesearcher("imgs/skullmultiplier.png")
+	if (clickpos != -1) {
 		logger("[LOOT] x4 Skulls found")
 		skullmuliplier++
 		graph := "x4_Skull"
 	} else {
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/minushouse.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/minushouse.png")
+		if (clickpos != -1) {
 			logger("[LOOT] -5 level found")
 			minuslevel++
 			graph := "5_Level"
 		} else {
-			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/craftboost.png
-			if (ErrorLevel = 0) {
+			clickpos := imagesearcher("imgs/craftboost.png")
+			if (clickpos != -1) {
 				logger("[LOOT] reduced 4h crafting time")
 				crafttime++
 				graph := "craftingTime"
 			} else {
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/diamonds.png
-				if (ErrorLevel = 0) {
+				clickpos := imagesearcher("imgs/diamonds.png")
+				if (clickpos != -1) {
 					logger("[LOOT] 5 diamonds found")
 					fivediamond++
 					graph := "5_Diamonds"
 				} else {
-					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/specialadd.png
-					if (ErrorLevel = 0) {
+					clickpos := imagesearcher("imgs/specialadd.png")
+					if (clickpos != -1) {
 						logger("[LOOT] 10 diamonds found")
 						tendiamond++
 						graph := "10_Diamonds"
 					} else {
-						ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/doubledmg.png
-						if (ErrorLevel = 0) {
+						clickpos := imagesearcher("imgs/doubledmg.png")
+						if (clickpos != -1) {
 							logger("[LOOT] x2 DMG")
 							doubledmg++
 							graph := "x2_DMG"
 						} else {
-							ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/3star.png
-							if (ErrorLevel = 0) {
+							clickpos := imagesearcher("imgs/3star.png")
+							if (clickpos != -1) {
 								logger("[LOOT] 3 star chest found")
 								chest3++
 								graph := "Chest"
@@ -837,16 +847,17 @@ lootprio() {
 		return
 	}
 
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/reward.png
-	if (ErrorLevel = 0) {
+	clickpos := imagesearcher("imgs/reward.png")
+	if (clickpos != -1) {
 		knownloot := false
 		logger("[LOOT] found chest loot.")
 		for k, v in lootarray {
 			quality = 0
 			loop, 3 {
 				quality++
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, *50 imgs/lootprio/%v%_%quality%.png
-				if (ErrorLevel = 0) {
+				; ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, *50 imgs/lootprio/%v%_%quality%.png
+				clickpos := imagesearcher("imgs/lootprio/" v "_" quality ".png")
+				if (clickpos != -1) {
 					logger("[LOOT] " . v . "_" . quality . " found.")
 					%v%_loot++
 					clickx := FoundX - posx + 60
@@ -943,6 +954,29 @@ checkupdate() {
 	} else {
 		logger("[GAME] Could not download version info from github")
 	}
+}
+
+imagesearcher(png) {
+	WinGet, progid, , %windowtitle%
+	zombidlescreen := Gdip_BitmapFromScreen("hwnd:"progid)
+	searchpic := Gdip_CreateBitmapFromFile(png)
+	findings := Gdip_ImageSearch(zombidlescreen,searchpic, outputlist)
+	Gdip_DisposeImage(zombidlescreen)
+	Gdip_DisposeImage(searchpic)
+	if (findings > 0) {
+		StringSplit, clickpositions, outputlist, `,
+		outputlist := "x"clickpositions1 " y"clickpositions2
+		return outputlist
+	} else {
+		return -1
+	}
+}
+
+exitfunc() {
+	global
+	saveinifunc()
+	Gdip_Shutdown(pToken)
+	logger("[GAME] Bot closed. Bye")
 }
 
 ;=============================
