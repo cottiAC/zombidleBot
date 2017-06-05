@@ -17,6 +17,7 @@ hasfocus := false
 mainscreen := false
 autolevelon := false
 autoabilityon := true
+autoscrollon := true
 autolevelon := true
 autocheston := true
 
@@ -110,11 +111,13 @@ Gui, Add, Radio, xp+50 yp gautolevel, Off
 Gui, Add, Text, x12 yp+20, use abilities:
 Gui, Add, Radio, xp+75 yp gautoability vautoabilityon checked, On
 Gui, Add, Radio, xp+50 yp gautoability, Off
-Gui, Add, GroupBox, x2 y9 w180 h80 , automatic actions
-Gui, Add, GroupBox, xp+190 y9 w180 h80 , world actions
+Gui, Add, Text, x12 yp+20, click scrolls:
+Gui, Add, Radio, xp+75 yp gautoscroll vautoscrollon checked, On
+Gui, Add, Radio, xp+50 yp gautoscroll, Off
+Gui, Add, GroupBox, x2 y9 w180 h100 , automatic actions
+Gui, Add, GroupBox, xp+190 y9 w180 h100 , world actions
 Gui, Add, Text, vStatus x12 w400, Starting Bot!
 Gui, Add, Text,vstatus2 x12 w400,
-Gui, Add, Text,vstatus3 x12 w400,
 Gui, Add, Text,vstatus4 x12 w400,
 Gui, Add, Button, x12 w100 gPauseButton Default, pause Bot
 Gui, Add, Button, xp+300 w100 gResetButton Default, Reset World
@@ -134,7 +137,6 @@ return
 
 AutoFire:
 	Critical
-	SetControlDelay -1
 	ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
 	clicks++
 return
@@ -241,7 +243,7 @@ generalLoop() {
 			lootprio()
 			upgrademonster()
 			checkworld()
-			scrollHandle()
+			; scrollHandle()
 		}
 		sleep 1000
 	}
@@ -708,6 +710,9 @@ upgrademonster() {
 
 scrollHandle() {
 	global
+	if (!autoscrollon) {
+		return
+	}
 	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/thedeal.png
 	if (ErrorLevel = 0) {
 		logger("[LOOT] Found deal without clicking scroll")
@@ -718,7 +723,6 @@ scrollHandle() {
 		SetTimer, AutoFire, Off
 		if (deal = false) {
 			logger("[LOOT] Scroll found")
-			GuiControl,,Status3, %FoundX% %FoundY%
 			clickx := FoundX - posx + 20
 			clicky := FoundY - posy + 20
 			loop {
@@ -749,8 +753,6 @@ scrollHandle() {
 
 		activateautofire()
 		deal := false
-	} else if (ErrorLevel = 1) {
-		GuiControl,,Status3, Waiting for a scroll ....
 	}
 }
 
@@ -991,3 +993,6 @@ GuiControlGet, autoabilityon
 
 autochest:
 GuiControlGet, autocheston
+
+autoscroll:
+GuiControlGet, autoscrollon
