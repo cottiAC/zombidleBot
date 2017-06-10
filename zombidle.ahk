@@ -729,15 +729,6 @@ scrollHandle() {
 			logger("[LOOT] Scroll found")
 			clickx := FoundX - posx + 20
 			clicky := FoundY - posy + 20
-			; loop {
-				; ControlClick, %clickpos%,%windowtitle%,,,, Pos NA
-				; sleep, 100
-				; logger("[LOOT] Clicking scroll")
-				; clickpos := imagesearcher("imgs/scroll.png")
-				; if (clickpos = -1) {
-					; clickpos := imagesearcher("imgs/scrollinactive.png")
-				; }
-			; } until (clickpos = -1)
 
 			loop, 5 {
 				ControlClick, %clickpos%,%windowtitle%,,,, Pos NA
@@ -747,10 +738,16 @@ scrollHandle() {
 		}
 		identifiyloot()
 		sleep, 1000
-		loop, 5 {
-			ControlClick, x660 y562,%windowtitle%,,,, Pos NA
-			sleep, 100
+		clickpos := imagesearcher("imgs/bloodstone0.png")
+		ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+		if (clickpos != -1) {
+			logger("[LOOT] 0 free Bloodstones left. Using one of the stored bloodstones")
+			sleep, 1000
+			ControlClick, x600 y440,%windowtitle%,,,, Pos NA
+		} else {
+			logger("[LOOT] using a free blodstone")
 		}
+
 		if (graph != "10_Diamonds") {
 			sleep 18000
 			loop, 5 {
@@ -827,7 +824,7 @@ identifiyloot() {
 								chestfound := true
 							} else {
 								logger("[LOOT] **** ERROR **** - could not identify loot")
-								TrayTip, WTF Loot, WTF Loot, 10, 1
+								; TrayTip, WTF Loot, WTF Loot, 10, 1
 								graph := "NA"
 							}
 						}
