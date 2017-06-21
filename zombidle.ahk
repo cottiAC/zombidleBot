@@ -281,7 +281,10 @@ switchworld(curworld, reset:=false) {
 	currenttab := gettab()
 	if (currenttab != "worldtab") {
 		sleep 1000
-		ControlClick, %worldtab% ,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, %worldtab% ,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
 		sleep 1000
 	}
 
@@ -306,25 +309,37 @@ switchworld(curworld, reset:=false) {
 	}
 
 	if (curworld = "1") {
-		ControlClick, x670 y515,%windowtitle%,,,, Pos NA
-		sleep 1000
-		ControlClick, x330 y700,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, x960 y430,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 2000
+		ControlClick, x300 y600,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "2") {
-		ControlClick, x590 y700,%windowtitle%,,,, Pos NA
-		sleep 1000
-		ControlClick, x230 y430,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, x747 y620,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 2000
+			ControlClick, x200 y350,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "3") {
-		ControlClick, x550 y500,%windowtitle%,,,, Pos NA
-		sleep 1000
-		ControlClick, x600 y300,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, x700 y400,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 2000
+		ControlClick, x630 y300,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "4") {
 		if (reset = false) {
-			ControlClick, x600 y670,%windowtitle%,,,, Pos NA
-			sleep 1000
-			ControlClick, x690 y560,%windowtitle%,,,, Pos NA
+			loop, 3 {
+				ControlClick, x760 y580,%windowtitle%,,,, Pos NA
+				sleep 50
+			}
+			sleep 2000
+			ControlClick, x700 y480,%windowtitle%,,,, Pos NA
 		} else {
 			loop, 5 {
 				ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
@@ -361,7 +376,7 @@ switchworld(curworld, reset:=false) {
 		}
 	} else {
 		sleep 1000
-		ControlClick, x700 y530,%windowtitle%,,,, Pos NA
+		ControlClick, x850 y450,%windowtitle%,,,, Pos NA
 		sleep 500
 	}
 
@@ -629,8 +644,6 @@ upgrademonster() {
 			logger("[PROGRESS] Leveling Carl.")
 			SetTimer, AutoFire, Off
 			sleep 1000
-			; clickx := FoundX - posx + 0
-			; clicky := FoundY - posy + 0
 			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 			sleep 1000
 			activateautofire()
@@ -727,9 +740,6 @@ scrollHandle() {
 		SetTimer, AutoFire, Off
 		if (deal = false) {
 			logger("[LOOT] Scroll found")
-			clickx := FoundX - posx + 20
-			clicky := FoundY - posy + 20
-
 			loop, 5 {
 				ControlClick, %clickpos%,%windowtitle%,,,, Pos NA
 				sleep 100
@@ -739,11 +749,17 @@ scrollHandle() {
 		identifiyloot()
 		sleep, 1000
 		clickpos := imagesearcher("imgs/bloodstone0.png")
-		ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+		; loop, 2 {
+			ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+			sleep 75
+		; }
 		if (clickpos != -1) {
 			logger("[LOOT] 0 free Bloodstones left. Using one of the stored bloodstones")
 			sleep, 1000
-			ControlClick, x600 y440,%windowtitle%,,,, Pos NA
+			; loop, 2 {
+				ControlClick, x600 y440,%windowtitle%,,,, Pos NA
+				sleep 75
+			; }
 		} else {
 			logger("[LOOT] using a free blodstone")
 		}
