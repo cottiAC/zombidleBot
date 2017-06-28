@@ -2,9 +2,11 @@
 #NoEnv
 #Include %A_ScriptDir%\Gdip_all.ahk
 #Include %A_ScriptDir%\Gdip_ImageSearch.ahk
+#installMouseHook
 CoordMode, Pixel, Screen
 SetTitleMatchMode, 3
-SendMode Input
+SendMode, Input
+SetMouseDelay 50
 SysGet, workArea, Monitor, 2
 
 fullcurrentversion := "2.0.1"
@@ -313,7 +315,7 @@ switchworld(curworld, reset:=false) {
 			ControlClick, x960 y430,%windowtitle%,,,, Pos NA
 			sleep 50
 		}
-		sleep 2000
+		sleep 4000
 		ControlClick, x300 y600,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "2") {
@@ -321,7 +323,7 @@ switchworld(curworld, reset:=false) {
 			ControlClick, x747 y620,%windowtitle%,,,, Pos NA
 			sleep 50
 		}
-		sleep 2000
+		sleep 4000
 			ControlClick, x200 y350,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "3") {
@@ -639,12 +641,14 @@ upgrademonster() {
 	}
 
 	if (Mod(upgrademonstertimer, upgradecarlinterval) = 0) {
-		clickpos := imagesearcher("imgs/upgrade.png")
+		clickpos := imagesearcher("imgs/upgrade.png", 0)
 		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Carl.")
 			SetTimer, AutoFire, Off
 			sleep 1000
-			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
+			ControlClick, x960 y660, %windowtitle%,,,, Pos NA
+			sleep 500
+			ControlClick, x960 y600, %windowtitle%,,,, Pos NA
 			sleep 1000
 			activateautofire()
 
@@ -969,7 +973,7 @@ checkupdate() {
 	}
 }
 
-imagesearcher(png) {
+imagesearcher(png, xcorrection:=0, ycorrection:=0) {
 	WinGet, progid, , %windowtitle%
 	zombidlescreen := Gdip_BitmapFromScreen("hwnd:"progid)
 	searchpic := Gdip_CreateBitmapFromFile(png)
@@ -978,7 +982,7 @@ imagesearcher(png) {
 	Gdip_DisposeImage(searchpic)
 	if (findings > 0) {
 		StringSplit, clickpositions, outputlist, `,
-		outputlist := "x"clickpositions1 " y"clickpositions2
+		outputlist := "x"clickpositions1 + xcorrection " y"clickpositions2 + ycorrection
 		return outputlist
 	} else {
 		return -1
