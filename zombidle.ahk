@@ -6,7 +6,6 @@
 CoordMode, Pixel, Screen
 SetTitleMatchMode, 3
 SendMode, Input
-SetMouseDelay 50
 SysGet, workArea, Monitor, 2
 
 fullcurrentversion := "2.0.1"
@@ -22,7 +21,7 @@ autolevelon := false
 autoabilityon := true
 autoscrollon := true
 autolevelon := true
-autocheston := true
+autocheston := false
 
 world := "unknown"
 currenttab := "unknown"
@@ -140,8 +139,8 @@ Gui, Add, Text, x12 y30 , Click:
 Gui, Add, Radio, xp+75 yp gclicker vautoclickeron checked, On
 Gui, Add, Radio, xp+50 yp gclicker, Off
 Gui, Add, Text, xp+70 yp, find chests:
-Gui, Add, Radio, xp+75 yp gautochest vautocheston checked, On
-Gui, Add, Radio, xp+50 yp gautochest, Off
+Gui, Add, Radio, xp+75 yp gautochest vautocheston, On
+Gui, Add, Radio, xp+50 yp gautochest checked, Off
 Gui, Add, Text, x12 yp+20, Buy monster:
 Gui, Add, Radio, xp+75 yp gautolevel vautolevelon checked, On
 Gui, Add, Radio, xp+50 yp gautolevel, Off
@@ -366,7 +365,7 @@ switchworld(curworld, reset:=false) {
 			sleep 50
 		}
 		sleep 2000
-		ControlClick, x630 y300,%windowtitle%,,,, Pos NA
+		ControlClick, x630 y100,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "4") {
 		if (reset = false) {
