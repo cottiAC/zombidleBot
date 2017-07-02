@@ -29,6 +29,8 @@ currenttab := "unknown"
 checkworldtimer := 0
 upgrademonstertimer := 0
 lootarray := []
+freebsarray := []
+bankbsarray := []
 
 IniRead, clicks, stats.log, stats, clicks, 0
 IniRead, scrolls, stats.log, stats, scrolls, 0
@@ -82,6 +84,38 @@ if (lootpriolist) {
 	lootarray := ["tablet", "ring", "potion", "chalice", "king", "lich", "zombie", "bat", "mace", "plague", "specter", "squid", "axe", "sword"]
 	for k, v in lootarray {
 		IniWrite, %v%, privatesettings.ini, lootpriolist, prio%A_Index%
+	}
+}
+
+IniRead, freebslist, privatesettings.ini, freebslist
+if (freebslist) {
+	initcount:=0
+	Loop, parse, freebslist, `n
+		initcount++
+	Loop, %initcount% {
+		IniRead, prio%A_Index%, privatesettings.ini, freebslist, prio%A_Index%
+		freebsarray.Push(prio%A_Index%)
+	}
+} else {
+	freebsarray := ["craftingTime", "5_Diamonds", "5_Level", "x4_Skull"]
+	for k, v in freebsarray {
+		IniWrite, %v%, privatesettings.ini, freebslist, prio%A_Index%
+	}
+}
+
+IniRead, bankbslist, privatesettings.ini, bankbslist
+if (bankbslist) {
+	initcount:=0
+	Loop, parse, bankbslist, `n
+		initcount++
+	Loop, %initcount% {
+		IniRead, prio%A_Index%, privatesettings.ini, bankbslist, prio%A_Index%
+		bankbsarray.Push(prio%A_Index%)
+	}
+} else {
+	bankbsarray := ["craftingTime", "5_Diamonds"]
+	for k, v in bankbsarray {
+		IniWrite, %v%, privatesettings.ini, bankbslist, prio%A_Index%
 	}
 }
 
@@ -752,31 +786,39 @@ scrollHandle() {
 		}
 		identifiyloot()
 		sleep, 1000
-		clickpos := imagesearcher("imgs/bloodstone0.png")
-		; loop, 2 {
-			ControlClick, x850 y480,%windowtitle%,,,, Pos NA
-			sleep 75
-		; }
-		if (clickpos != -1) {
-			logger("[LOOT] 0 free Bloodstones left. Using one of the stored bloodstones")
-			sleep, 1000
-			; loop, 2 {
-				ControlClick, x600 y440,%windowtitle%,,,, Pos NA
-				sleep 75
-			; }
-		} else {
-			logger("[LOOT] using a free blodstone")
-		}
 
-		if (graph != "10_Diamonds") {
-			sleep 18000
-			loop, 5 {
-				ControlClick, x680 y246,%windowtitle%,,,, Pos NA
-				sleep, 100
+		clickpos := imagesearcher("imgs/bloodstone0.png")
+		bslooter := false
+		if (clickpos != -1) {
+			for k, v in bankbsarray {
+				if (graph = v) {
+					logger("[LOOT] 0 free Bloodstones left. Using one of the stored bloodstones for " graph)
+					bslooter := true
+					ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+					sleep, 1000
+					ControlClick, x600 y440,%windowtitle%,,,, Pos NA
+				}
+			}
+			if (bslooter = false) {
+				logger("[LOOT] 0 free Bloodstones left. " graph " is not in bankbslist (privatesettings.ini) so I will not collect the deal")
+				ControlClick, x570 y480,%windowtitle%,,,, Pos NA
+			}
+		} else {
+			for k, v in freebsarray {
+				if (graph = v) {
+					logger("[LOOT] using a free blodstone for " graph)
+					bslooter := true
+					ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+				}
+			}
+			if (bslooter = false) {
+				logger("[LOOT] " graph " is not in freebslist (privatesettings.ini) so I will not collect the deal")
+				ControlClick, x570 y480,%windowtitle%,,,, Pos NA
 			}
 		}
-		scrolls++
 
+		scrolls++
+		sleep, 2000
 		activateautofire()
 		deal := false
 	}
