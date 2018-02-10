@@ -364,7 +364,7 @@ switchworld(curworld, reset:=false) {
 			ControlClick, x700 y400,%windowtitle%,,,, Pos NA
 			sleep 50
 		}
-		sleep 2000
+		sleep 4000
 		ControlClick, x630 y100,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "4") {
@@ -373,7 +373,7 @@ switchworld(curworld, reset:=false) {
 				ControlClick, x760 y580,%windowtitle%,,,, Pos NA
 				sleep 50
 			}
-			sleep 2000
+			sleep 4000
 			ControlClick, x700 y480,%windowtitle%,,,, Pos NA
 		} else {
 			loop, 5 {
@@ -386,9 +386,12 @@ switchworld(curworld, reset:=false) {
 	}
 	if (curworld = "5") {
 		if (reset = false) {
-			ControlClick, x600 y670,%windowtitle%,,,, Pos NA
-			sleep 1000
-			ControlClick, x690 y560,%windowtitle%,,,, Pos NA
+			loop, 3 {
+				ControlClick, x700 y500,%windowtitle%,,,, Pos NA
+				sleep 75
+			}
+			sleep 4000
+			ControlClick, x700 y520,%windowtitle%,,,, Pos NA
 		} else {
 			; loop, 5 {
 				; ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
@@ -411,7 +414,10 @@ switchworld(curworld, reset:=false) {
 		}
 	} else {
 		sleep 1000
-		ControlClick, x850 y450,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, x850 y450,%windowtitle%,,,, Pos NA
+			sleep 75
+		}
 		sleep 500
 	}
 
@@ -645,8 +651,12 @@ checkworld() {
 			} else {
 				clickpos := imagesearcher("imgs/world3complete.png")
 				if (clickpos != -1) {
-					world := "3"
-					logger("[PROGRESS] World 3 is complete.")
+					sleep 4000
+					clickpos := imagesearcher("imgs/world3complete.png")
+					if (clickpos != -1) {
+						world := "3"
+						logger("[PROGRESS] World 3 is complete.")
+					}
 				} else {
 					clickpos := imagesearcher("imgs/world4complete.png")
 					if (clickpos != -1) {
@@ -656,8 +666,18 @@ checkworld() {
 							world := "4"
 							logger("[PROGRESS] World 4 is complete.")
 						}
+					} else {
+						clickpos := imagesearcher("imgs/world5complete.png")
+						if (clickpos != -1) {
+							sleep 4000
+							clickpos := imagesearcher("imgs/world5complete.png")
+							if (clickpos != -1) {
+								world := "5"
+								logger("[PROGRESS] World 5 is complete.")
+							}
+						}
 					}
-				}
+				} 
 			}
 		}
 		if (world != "unknown") {
@@ -786,36 +806,44 @@ scrollHandle() {
 		identifiyloot()
 		sleep, 1000
 
-		clickpos := imagesearcher("imgs/bloodstone0.png")
-		bslooter := false
-		if (clickpos != -1) {
-			for k, v in bankbsarray {
-				if (graph = v) {
-					logger("[LOOT] 0 free Bloodstones left. Using one of the stored bloodstones for " graph)
-					bslooter := true
-					ControlClick, x850 y480,%windowtitle%,,,, Pos NA
-					sleep, 1000
-					ControlClick, x600 y440,%windowtitle%,,,, Pos NA
-				}
-			}
-			if (bslooter = false) {
-				logger("[LOOT] 0 free Bloodstones left. " graph " is not in bankbslist (privatesettings.ini) so I will not collect the deal")
-				ControlClick, x570 y480,%windowtitle%,,,, Pos NA
-			}
+		awesome := imagesearcher("imgs/awesome.png")
+		
+		if (awesome != -1) {
+			logger("[LOOT] Free Devil Deal Event. Collect " graph)
+			ControlClick, x850 y480,%windowtitle%,,,, Pos NA
 		} else {
-			for k, v in freebsarray {
-				if (graph = v) {
-					logger("[LOOT] using a free blodstone for " graph)
-					bslooter := true
-					ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+			clickpos := imagesearcher("imgs/bloodstone0.png")
+			bslooter := false
+			
+			if (clickpos != -1) {
+				for k, v in bankbsarray {
+					if (graph = v) {
+						logger("[LOOT] 0 free Bloodstones left. Using one of the stored bloodstones for " graph)
+						bslooter := true
+						ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+						sleep, 1000
+						ControlClick, x600 y440,%windowtitle%,,,, Pos NA
+					}
 				}
-			}
-			if (bslooter = false) {
-				logger("[LOOT] " graph " is not in freebslist (privatesettings.ini) so I will not collect the deal")
-				ControlClick, x570 y480,%windowtitle%,,,, Pos NA
+				if (bslooter = false) {
+					logger("[LOOT] 0 free Bloodstones left. " graph " is not in bankbslist (privatesettings.ini) so I will not collect the deal")
+					ControlClick, x570 y480,%windowtitle%,,,, Pos NA
+				}
+			} else {
+				for k, v in freebsarray {
+					if (graph = v) {
+						logger("[LOOT] using a free blodstone for " graph)
+						bslooter := true
+						ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+					}
+				}
+				if (bslooter = false) {
+					logger("[LOOT] " graph " is not in freebslist (privatesettings.ini) so I will not collect the deal")
+					ControlClick, x570 y480,%windowtitle%,,,, Pos NA
+				}
 			}
 		}
-
+		
 		scrolls++
 		sleep, 2000
 		activateautofire()
