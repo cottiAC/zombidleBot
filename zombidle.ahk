@@ -401,6 +401,14 @@ switchworld(curworld, reset:=false) {
 			sleep 1000
 		}
 	}
+	if (curworld = "6") {
+		loop, 3 {
+			ControlClick, x1020 y350,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 4000
+		ControlClick, x550 y550,%windowtitle%,,,, Pos NA		
+	}
 
 	if (reset = true) {
 		clickpos := imagesearcher("imgs/reset.png")
@@ -674,6 +682,16 @@ checkworld() {
 							if (clickpos != -1) {
 								world := "5"
 								logger("[PROGRESS] World 5 is complete.")
+							}
+						} else {
+							clickpos := imagesearcher("imgs/world6complete.png")
+							if (clickpos != -1) {
+								sleep 4000
+								clickpos := imagesearcher("imgs/world6complete.png")
+								if (clickpos != -1) {
+									world := "6"
+									logger("[PROGRESS] World 6 is complete.")
+								}
 							}
 						}
 					}
