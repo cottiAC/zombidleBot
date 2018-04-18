@@ -1,8 +1,6 @@
 # zombidleBot
 Autohotkey project for idle game [Zombidle](http://www.zombidle.de)
 
-## Working on a Steam Bot version right now. Stay tuned. You can try the current work in progress build [here](https://github.com/cottiAC/zombidleBot/tree/steamrelease)
-
 ## Overview
 * [Getting Started and Upgrading to latest Bot version](#getting-started)
 * [Features](#features)
@@ -42,10 +40,11 @@ Autohotkey project for idle game [Zombidle](http://www.zombidle.de)
 ![](https://github.com/cottiAC/zombidleBot/blob/master/imgs/readme/graph.png)
 
 ## Limitation
-* works only with Firefox right now
+* works only with Steam release right now
+* You need to change the game resolution to 1136x640
 * if you use another browser window, the bot will not click to avoid take away focus
 * in order to find scrolls, the browser windows must be visible
-* Bot will switch from world 2 to 1, 1 to 3, 3 to 4. So you need to start with world 2 
+* Bot will switch from world 2 to 1, 1 to 3, 3 to 4 and so on. So you need to start with world 2 
 * you need [Autohotkey v1.1.*](https://autohotkey.com/) to run the script
 
 
