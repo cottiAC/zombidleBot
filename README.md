@@ -13,7 +13,7 @@ Autohotkey project for idle game [Zombidle](http://www.zombidle.de)
 ## Getting Started
 * Install  [Autohotkey v1.1.*](https://autohotkey.com/)
 * Download [latest zombildeBot release](https://github.com/cottiAC/zombidleBot/releases/latest) and unpack
-* Open a seperate Firefox window (<kbd>Ctrl+N</kbd> in FF) and go to [http://www.zombidle.de](http://www.zombidle.de)
+* Start the game and change the game resolution to 1136x640 
 * Start zombidle.ahk 
 
 ### Upgrading to latest version
