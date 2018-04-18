@@ -1,9 +1,11 @@
 #SingleInstance, Force
 #NoEnv
-
+#Include %A_ScriptDir%\Gdip_all.ahk
+#Include %A_ScriptDir%\Gdip_ImageSearch.ahk
+#installMouseHook
 CoordMode, Pixel, Screen
 SetTitleMatchMode, 3
-SendMode Input
+SendMode, Input
 SysGet, workArea, Monitor, 2
 
 fullcurrentversion := "2.0.1"
@@ -17,14 +19,17 @@ hasfocus := false
 mainscreen := false
 autolevelon := false
 autoabilityon := true
+autoscrollon := true
 autolevelon := true
-autocheston := true
+autocheston := false
 
 world := "unknown"
 currenttab := "unknown"
 checkworldtimer := 0
 upgrademonstertimer := 0
 lootarray := []
+freebsarray := []
+bankbsarray := []
 
 IniRead, clicks, stats.log, stats, clicks, 0
 IniRead, scrolls, stats.log, stats, scrolls, 0
@@ -40,7 +45,7 @@ IniRead, chest3, stats.log, loot, chest3, 0
 IniRead, guipos, privatesettings.ini, general, guipos, x0 y0
 IniRead, browserposx, privatesettings.ini, general, browserposx, 0
 IniRead, browserposy, privatesettings.ini, general, browserposy, 0
-IniRead, windowtitle, privatesettings.ini, general, windowtitle, Zombidle! - Mozilla Firefox
+IniRead, windowtitle, privatesettings.ini, general, windowtitle, Zombidle
 IniRead, windowwidth, privatesettings.ini, general, windowwidth, 995
 IniRead, windowheight, privatesettings.ini, general, windowheight, 760
 IniRead, graphiteenable, privatesettings.ini, general, graphiteenable, false
@@ -61,7 +66,6 @@ IniRead, worldtab, settings.ini, positions, worldtab
 IniRead, monstertab, settings.ini, positions, monstertab
 IniRead, scrollright, settings.ini, positions, scrollright
 IniRead, scrollleft, settings.ini, positions, scrollleft
-IniRead, carl, settings.ini, positions, carl
 IniRead, tombking, settings.ini, positions, tombking
 IniRead, maxbuy, settings.ini, positions, maxbuy
 IniRead, buyskills, settings.ini, positions, buyskills
@@ -79,6 +83,38 @@ if (lootpriolist) {
 	lootarray := ["tablet", "ring", "potion", "chalice", "king", "lich", "zombie", "bat", "mace", "plague", "specter", "squid", "axe", "sword"]
 	for k, v in lootarray {
 		IniWrite, %v%, privatesettings.ini, lootpriolist, prio%A_Index%
+	}
+}
+
+IniRead, freebslist, privatesettings.ini, freebslist
+if (freebslist) {
+	initcount:=0
+	Loop, parse, freebslist, `n
+		initcount++
+	Loop, %initcount% {
+		IniRead, prio%A_Index%, privatesettings.ini, freebslist, prio%A_Index%
+		freebsarray.Push(prio%A_Index%)
+	}
+} else {
+	freebsarray := ["craftingTime", "5_Diamonds", "5_Level", "x4_Skull"]
+	for k, v in freebsarray {
+		IniWrite, %v%, privatesettings.ini, freebslist, prio%A_Index%
+	}
+}
+
+IniRead, bankbslist, privatesettings.ini, bankbslist
+if (bankbslist) {
+	initcount:=0
+	Loop, parse, bankbslist, `n
+		initcount++
+	Loop, %initcount% {
+		IniRead, prio%A_Index%, privatesettings.ini, bankbslist, prio%A_Index%
+		bankbsarray.Push(prio%A_Index%)
+	}
+} else {
+	bankbsarray := ["craftingTime", "5_Diamonds"]
+	for k, v in bankbsarray {
+		IniWrite, %v%, privatesettings.ini, bankbslist, prio%A_Index%
 	}
 }
 
@@ -103,19 +139,21 @@ Gui, Add, Text, x12 y30 , Click:
 Gui, Add, Radio, xp+75 yp gclicker vautoclickeron checked, On
 Gui, Add, Radio, xp+50 yp gclicker, Off
 Gui, Add, Text, xp+70 yp, find chests:
-Gui, Add, Radio, xp+75 yp gautochest vautocheston checked, On
-Gui, Add, Radio, xp+50 yp gautochest, Off
+Gui, Add, Radio, xp+75 yp gautochest vautocheston, On
+Gui, Add, Radio, xp+50 yp gautochest checked, Off
 Gui, Add, Text, x12 yp+20, Buy monster:
 Gui, Add, Radio, xp+75 yp gautolevel vautolevelon checked, On
 Gui, Add, Radio, xp+50 yp gautolevel, Off
 Gui, Add, Text, x12 yp+20, use abilities:
 Gui, Add, Radio, xp+75 yp gautoability vautoabilityon checked, On
 Gui, Add, Radio, xp+50 yp gautoability, Off
-Gui, Add, GroupBox, x2 y9 w180 h80 , automatic actions
-Gui, Add, GroupBox, xp+190 y9 w180 h80 , world actions
+Gui, Add, Text, x12 yp+20, click scrolls:
+Gui, Add, Radio, xp+75 yp gautoscroll vautoscrollon checked, On
+Gui, Add, Radio, xp+50 yp gautoscroll, Off
+Gui, Add, GroupBox, x2 y9 w180 h100 , automatic actions
+Gui, Add, GroupBox, xp+190 y9 w180 h100 , world actions
 Gui, Add, Text, vStatus x12 w400, Starting Bot!
 Gui, Add, Text,vstatus2 x12 w400,
-Gui, Add, Text,vstatus3 x12 w400,
 Gui, Add, Text,vstatus4 x12 w400,
 Gui, Add, Button, x12 w100 gPauseButton Default, pause Bot
 Gui, Add, Button, xp+300 w100 gResetButton Default, Reset World
@@ -123,7 +161,7 @@ Gui, Color, daffb4
 Gui, Show, %guipos% NoActivate, Zombidle Status
 
 logger("[GAME] Bot initialized. Start generalLoop")
-OnExit("saveinifunc")
+OnExit("exitfunc")
 
 generalLoop()
 
@@ -148,26 +186,27 @@ abilities:
 
 	if (slothonly = true) {
 		loop, 4 {
-			ControlSend,, 1, %windowtitle%
+			ControlSend,, {1 down}{1 up}, %windowtitle%
 			sleep, 50
 		}
 		logger("[PROGRESS] Start only Sloths Form")
 		slothonly := false
 	} else {
 		loop, 4 {
-			ControlSend,, 1, %windowtitle%
+			ControlSend,, {1 down}{1 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 2, %windowtitle%
+			ControlSend,, {2 down}{2 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 3, %windowtitle%
+			ControlSend,, {3 down}{3 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 4, %windowtitle%
+			ControlSend,, {4 down}{4 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 5, %windowtitle%
+			ControlSend,, {5 down}{5 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 6, %windowtitle%
+			ControlSend,, {6 down}{6 up}, %windowtitle%
 			sleep, 50
-			ControlSend,, 7, %windowtitle%
+			ControlSend,, {7 down}{7 up}, %windowtitle%
+			sleep, 50
 		}
 		logger("[PROGRESS] Start all abilities")
 		slothonly := true
@@ -207,8 +246,13 @@ return
 
 generalLoop() {
 	global
-	WinMove, %windowtitle%,, %browserposx%, %browserposy%, %windowwidth%, %windowheight%
+	; WinMove, %windowtitle%,, %browserposx%, %browserposy%, %windowwidth%, %windowheight%
 	logger("[GAME] GeneralLoop started")
+	If !pToken := Gdip_Startup() {
+		MsgBox, 48, gdiplus error!, Gdiplus failed to start. Please ensure you have gdiplus on your system
+		logger("[GAME] gdiplus error!, Gdiplus failed to start")
+		ExitApp
+	}
 	loop {
 		checkgame("looper")
 		if (exitThread) OR (pauser) {
@@ -219,29 +263,15 @@ generalLoop() {
 		WinGetPos, posx, posy, endposx, endposy, %windowtitle%
 		MouseGetPos, , , id, control
 		WinGetClass, class, ahk_id %id%
-		upgrademonster()
-		checkworld()
-		scrollHandle()
+		WinGetTitle, title, ahk_id %id%
 
-		if (control = "GeckoFPSandboxChildWindow1") {
+		if (class = "ApolloRuntimeContentWindow" and title = "Zombidle") {
 			if (A_TimeIdle>=idletime) {
 				GuiControl,,Status, Active! Mouse pointer in zombidle window but inactive for more than %idletime% seconds.
 				hasfocus := false
 				activateautofire()
 			} else {
 				GuiControl,,Status, Inactive! Mouse pointer in zombidle window.
-				hasfocus := true
-				SetTimer, AutoFire, Off
-			}
-		} else if (class = "MozillaWindowClass" or class = "MozillaDropShadowWindowClass" or class = "MozillaDialogClass") {
-			if (A_TimeIdle>=idletime) {
-				activateautofire()
-				GuiControl,,Status, Active! Mouse pointer in some browser window but inactive for more than %idletime% seconds.
-				hasfocus := false
-			} else {
-				SetTimer, AutoFire, Off
-				waittime := Ceil(A_TimeIdle / 1000)
-				GuiControl,,Status, Inactive! Mouse pointer in some browser window. Idle since: %waittime% seconds.
 				hasfocus := true
 				SetTimer, AutoFire, Off
 			}
@@ -252,6 +282,9 @@ generalLoop() {
 		}
 		if (hasfocus = false) {
 			lootprio()
+			upgrademonster()
+			checkworld()
+			scrollHandle()
 		}
 		sleep 1000
 	}
@@ -283,7 +316,10 @@ switchworld(curworld, reset:=false) {
 	currenttab := gettab()
 	if (currenttab != "worldtab") {
 		sleep 1000
-		ControlClick, %worldtab% ,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, %worldtab% ,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
 		sleep 1000
 	}
 
@@ -308,25 +344,37 @@ switchworld(curworld, reset:=false) {
 	}
 
 	if (curworld = "1") {
-		ControlClick, x670 y515,%windowtitle%,,,, Pos NA
-		sleep 1000
-		ControlClick, x330 y700,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, x960 y430,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 4000
+		ControlClick, x300 y600,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "2") {
-		ControlClick, x590 y700,%windowtitle%,,,, Pos NA
-		sleep 1000
-		ControlClick, x230 y430,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, x747 y620,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 4000
+			ControlClick, x200 y350,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "3") {
-		ControlClick, x550 y500,%windowtitle%,,,, Pos NA
-		sleep 1000
-		ControlClick, x600 y300,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, x700 y400,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 4000
+		ControlClick, x630 y100,%windowtitle%,,,, Pos NA
 	}
 	if (curworld = "4") {
 		if (reset = false) {
-			ControlClick, x600 y670,%windowtitle%,,,, Pos NA
-			sleep 1000
-			ControlClick, x690 y560,%windowtitle%,,,, Pos NA
+			loop, 3 {
+				ControlClick, x760 y580,%windowtitle%,,,, Pos NA
+				sleep 50
+			}
+			sleep 4000
+			ControlClick, x700 y480,%windowtitle%,,,, Pos NA
 		} else {
 			loop, 5 {
 				ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
@@ -338,9 +386,12 @@ switchworld(curworld, reset:=false) {
 	}
 	if (curworld = "5") {
 		if (reset = false) {
-			ControlClick, x600 y670,%windowtitle%,,,, Pos NA
-			sleep 1000
-			ControlClick, x690 y560,%windowtitle%,,,, Pos NA
+			loop, 3 {
+				ControlClick, x700 y500,%windowtitle%,,,, Pos NA
+				sleep 75
+			}
+			sleep 4000
+			ControlClick, x700 y520,%windowtitle%,,,, Pos NA
 		} else {
 			; loop, 5 {
 				; ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
@@ -350,10 +401,18 @@ switchworld(curworld, reset:=false) {
 			sleep 1000
 		}
 	}
+	if (curworld = "6") {
+		loop, 3 {
+			ControlClick, x1020 y350,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 4000
+		ControlClick, x550 y550,%windowtitle%,,,, Pos NA		
+	}
 
 	if (reset = true) {
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/reset.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/reset.png")
+		if (clickpos != -1) {
 			logger("[PROGRESS] Resetting world")
 			ControlClick, x250 y700,%windowtitle%,,,, Pos NA
 			sleep 1000
@@ -363,7 +422,10 @@ switchworld(curworld, reset:=false) {
 		}
 	} else {
 		sleep 1000
-		ControlClick, x700 y530,%windowtitle%,,,, Pos NA
+		loop, 3 {
+			ControlClick, x850 y450,%windowtitle%,,,, Pos NA
+			sleep 75
+		}
 		sleep 500
 	}
 
@@ -548,12 +610,12 @@ collectchests(curworld) {
 
 gettab() {
 	global
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/monstertab.png
-	if (ErrorLevel = 0) {
+	clickpos := imagesearcher("imgs/monstertab.png")
+	if (clickpos != -1) {
 		tab := "monstertab"
 	} else {
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/worldtab.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/worldtab.png")
+		if (clickpos != -1) {
 			tab := "worldtab"
 		} else {
 			tab := "unknown"
@@ -565,8 +627,8 @@ gettab() {
 checkworld() {
 	global
 	checkworldtimer++
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/tohell.png
-	if (ErrorLevel = 0) {
+	clickpos := imagesearcher("imgs/tohell.png")
+	if (clickpos != -1) {
 		mainscreen := true
 	} else {
 		mainscreen := false
@@ -577,39 +639,63 @@ checkworld() {
 		world := "unknown"
 		currenttab := gettab()
 
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/world1complete.png")
+		if (clickpos != -1) {
 			sleep, 4000
-			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world1complete.png
-			if (ErrorLevel = 0) {
+			clickpos := imagesearcher("imgs/world1complete.png")
+			if (clickpos != -1) {
 				world := "1"
 				logger("[PROGRESS] World 1 is complete.")
 			}
 		} else {
-			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world2complete.png
-			if (ErrorLevel = 0) {
+			clickpos := imagesearcher("imgs/world2complete.png")
+			if (clickpos != -1) {
 				sleep 4000
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world2complete.png
-				if (ErrorLevel = 0) {
+				clickpos := imagesearcher("imgs/world2complete.png")
+				if (clickpos != -1) {
 					world := "2"
 					logger("[PROGRESS] World 2 is complete.")
 				}
 			} else {
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world3complete.png
-				if (ErrorLevel = 0) {
-					world := "3"
-					logger("[PROGRESS] World 3 is complete.")
+				clickpos := imagesearcher("imgs/world3complete.png")
+				if (clickpos != -1) {
+					sleep 4000
+					clickpos := imagesearcher("imgs/world3complete.png")
+					if (clickpos != -1) {
+						world := "3"
+						logger("[PROGRESS] World 3 is complete.")
+					}
 				} else {
-					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world4complete.png
-					if (ErrorLevel = 0) {
+					clickpos := imagesearcher("imgs/world4complete.png")
+					if (clickpos != -1) {
 						sleep 4000
-						ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/world4complete.png
-						if (ErrorLevel = 0) {
+						clickpos := imagesearcher("imgs/world4complete.png")
+						if (clickpos != -1) {
 							world := "4"
 							logger("[PROGRESS] World 4 is complete.")
 						}
+					} else {
+						clickpos := imagesearcher("imgs/world5complete.png")
+						if (clickpos != -1) {
+							sleep 4000
+							clickpos := imagesearcher("imgs/world5complete.png")
+							if (clickpos != -1) {
+								world := "5"
+								logger("[PROGRESS] World 5 is complete.")
+							}
+						} else {
+							clickpos := imagesearcher("imgs/world6complete.png")
+							if (clickpos != -1) {
+								sleep 4000
+								clickpos := imagesearcher("imgs/world6complete.png")
+								if (clickpos != -1) {
+									world := "6"
+									logger("[PROGRESS] World 6 is complete.")
+								}
+							}
+						}
 					}
-				}
+				} 
 			}
 		}
 		if (world != "unknown") {
@@ -626,12 +712,17 @@ upgrademonster() {
 	}
 
 	if (Mod(upgrademonstertimer, upgradecarlinterval) = 0) {
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/upgrade.png", 0)
+		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Carl.")
-			clickx := FoundX - posx + 0
-			clicky := FoundY - posy + 0
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			SetTimer, AutoFire, Off
+			sleep 1000
+			ControlClick, x960 y660, %windowtitle%,,,, Pos NA
+			sleep 500
+			ControlClick, x960 y600, %windowtitle%,,,, Pos NA
+			sleep 1000
+			activateautofire()
+
 		}
 	}
 
@@ -649,14 +740,14 @@ upgrademonster() {
 			sleep 500
 		}
 
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/maxbuy.png
-		if (ErrorLevel != 0) {
+		clickpos := imagesearcher("imgs/maxbuy.png")
+		if (clickpos = -1) {
 			logger("[PROGRESS] Set buy size to MAX")
 			loop, 10 {
 				ControlClick, %maxbuy% ,%windowtitle%,,,, Pos NA
 				sleep, 100
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/maxbuy.png
-			} until (ErrorLevel = 0)
+				clickpos := imagesearcher("imgs/maxbuy.png")
+			} until (clickpos != -1)
 		}
 
 		loop, 15 {
@@ -670,41 +761,39 @@ upgrademonster() {
 		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
 		sleep 250
 
-		sleep 75
-
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgrade.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/upgrade.png")
+		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Carl.")
-			clickx := FoundX - posx + 0
-			clicky := FoundY - posy + 0
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			; clickx := FoundX - posx + 0
+			; clicky := FoundY - posy + 0
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 		}
 		sleep 75
 
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgradetombking.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/upgradetombking.png")
+		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Tomb King.")
-			clickx := FoundX - posx + 0
-			clicky := FoundY - posy + 160
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			; clickx := FoundX - posx + 0
+			; TODO ! clicky := FoundY - posy + 160
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 			sleep 75
-			clicky += 70
+			; TODO ! clicky += 70
 			loop, 2 {
-				ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+				ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 				sleep 100
 			}
 		}
 		sleep 75
 
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/upgradesquid.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/upgradesquid.png")
+		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Squid.")
-			clickx := FoundX - posx + 0
-			clicky := FoundY - posy + 160
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			; clickx := FoundX - posx + 0
+			; TODO ! clicky := FoundY - posy + 160
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 			sleep 75
-			clicky += 70
-			ControlClick, x%clickx% y%clicky%, %windowtitle%,,,, Pos NA
+			; TODO ! clicky += 70
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 		}
 
 		activateautofire()
@@ -713,49 +802,70 @@ upgrademonster() {
 
 scrollHandle() {
 	global
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/thedeal.png
-	if (ErrorLevel = 0) {
+	if (!autoscrollon) {
+		return
+	}
+	clickpos := imagesearcher("imgs/thedeal.png")
+	if (clickpos != -1) {
 		logger("[LOOT] Found deal without clicking scroll")
 		deal := true
 	}
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/scroll.png
-	if (ErrorLevel = 0 or deal = true) {
+	clickpos := imagesearcher("imgs/scroll.png")
+	if (clickpos != -1 or deal = true) {
 		SetTimer, AutoFire, Off
 		if (deal = false) {
 			logger("[LOOT] Scroll found")
-			GuiControl,,Status3, %FoundX% %FoundY%
-			clickx := FoundX - posx + 20
-			clicky := FoundY - posy + 20
-			loop {
-				ControlClick, x%clickx% y%clicky%,%windowtitle%,,,, Pos NA
-				sleep, 100
-				logger("[LOOT] Clicking scroll")
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/scroll.png
-				if (ErrorLevel = 1) {
-					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/scrollinactive.png
-				}
-			} until (ErrorLevel = 1)
+			loop, 5 {
+				ControlClick, %clickpos%,%windowtitle%,,,, Pos NA
+				sleep 100
+			}
 			sleep 2000
 		}
 		identifiyloot()
 		sleep, 1000
-		loop, 5 {
-			ControlClick, x660 y562,%windowtitle%,,,, Pos NA
-			sleep, 100
-		}
-		if (graph != "10_Diamonds") {
-			sleep 18000
-			loop, 5 {
-				ControlClick, x680 y246,%windowtitle%,,,, Pos NA
-				sleep, 100
+
+		awesome := imagesearcher("imgs/awesome.png")
+		
+		if (awesome != -1) {
+			logger("[LOOT] Free Devil Deal Event. Collect " graph)
+			ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+		} else {
+			clickpos := imagesearcher("imgs/bloodstone0.png")
+			bslooter := false
+			
+			if (clickpos != -1) {
+				for k, v in bankbsarray {
+					if (graph = v) {
+						logger("[LOOT] 0 free Bloodstones left. Using one of the stored bloodstones for " graph)
+						bslooter := true
+						ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+						sleep, 1000
+						ControlClick, x600 y440,%windowtitle%,,,, Pos NA
+					}
+				}
+				if (bslooter = false) {
+					logger("[LOOT] 0 free Bloodstones left. " graph " is not in bankbslist (privatesettings.ini) so I will not collect the deal")
+					ControlClick, x570 y480,%windowtitle%,,,, Pos NA
+				}
+			} else {
+				for k, v in freebsarray {
+					if (graph = v) {
+						logger("[LOOT] using a free blodstone for " graph)
+						bslooter := true
+						ControlClick, x850 y480,%windowtitle%,,,, Pos NA
+					}
+				}
+				if (bslooter = false) {
+					logger("[LOOT] " graph " is not in freebslist (privatesettings.ini) so I will not collect the deal")
+					ControlClick, x570 y480,%windowtitle%,,,, Pos NA
+				}
 			}
 		}
+		
 		scrolls++
-
+		sleep, 2000
 		activateautofire()
 		deal := false
-	} else if (ErrorLevel = 1) {
-		GuiControl,,Status3, Waiting for a scroll ....
 	}
 }
 
@@ -777,51 +887,51 @@ identifiyloot() {
 	T = %A_NowUTC%
 	T -= 19700101000000,seconds
 	graph := "null"
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/skullmultiplier.png
-	if (ErrorLevel = 0) {
+	clickpos := imagesearcher("imgs/skullmultiplier.png")
+	if (clickpos != -1) {
 		logger("[LOOT] x4 Skulls found")
 		skullmuliplier++
 		graph := "x4_Skull"
 	} else {
-		ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/minushouse.png
-		if (ErrorLevel = 0) {
+		clickpos := imagesearcher("imgs/minushouse.png")
+		if (clickpos != -1) {
 			logger("[LOOT] -5 level found")
 			minuslevel++
 			graph := "5_Level"
 		} else {
-			ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/craftboost.png
-			if (ErrorLevel = 0) {
+			clickpos := imagesearcher("imgs/craftboost.png")
+			if (clickpos != -1) {
 				logger("[LOOT] reduced 4h crafting time")
 				crafttime++
 				graph := "craftingTime"
 			} else {
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/diamonds.png
-				if (ErrorLevel = 0) {
+				clickpos := imagesearcher("imgs/diamonds.png")
+				if (clickpos != -1) {
 					logger("[LOOT] 5 diamonds found")
 					fivediamond++
 					graph := "5_Diamonds"
 				} else {
-					ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/specialadd.png
-					if (ErrorLevel = 0) {
+					clickpos := imagesearcher("imgs/specialadd.png")
+					if (clickpos != -1) {
 						logger("[LOOT] 10 diamonds found")
 						tendiamond++
 						graph := "10_Diamonds"
 					} else {
-						ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/doubledmg.png
-						if (ErrorLevel = 0) {
+						clickpos := imagesearcher("imgs/doubledmg.png")
+						if (clickpos != -1) {
 							logger("[LOOT] x2 DMG")
 							doubledmg++
 							graph := "x2_DMG"
 						} else {
-							ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/3star.png
-							if (ErrorLevel = 0) {
+							clickpos := imagesearcher("imgs/3star.png")
+							if (clickpos != -1) {
 								logger("[LOOT] 3 star chest found")
 								chest3++
 								graph := "Chest"
 								chestfound := true
 							} else {
 								logger("[LOOT] **** ERROR **** - could not identify loot")
-								TrayTip, WTF Loot, WTF Loot, 10, 1
+								; TrayTip, WTF Loot, WTF Loot, 10, 1
 								graph := "NA"
 							}
 						}
@@ -841,16 +951,17 @@ lootprio() {
 		return
 	}
 
-	ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, imgs/reward.png
-	if (ErrorLevel = 0) {
+	clickpos := imagesearcher("imgs/reward.png")
+	if (clickpos != -1) {
 		knownloot := false
 		logger("[LOOT] found chest loot.")
 		for k, v in lootarray {
 			quality = 0
 			loop, 3 {
 				quality++
-				ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, *50 imgs/lootprio/%v%_%quality%.png
-				if (ErrorLevel = 0) {
+				; ImageSearch, FoundX, FoundY, %posx%, %posy%, posx + endposx, posy + endposy, *50 imgs/lootprio/%v%_%quality%.png
+				clickpos := imagesearcher("imgs/lootprio/" v "_" quality ".png")
+				if (clickpos != -1) {
 					logger("[LOOT] " . v . "_" . quality . " found.")
 					%v%_loot++
 					clickx := FoundX - posx + 60
@@ -949,6 +1060,29 @@ checkupdate() {
 	}
 }
 
+imagesearcher(png, xcorrection:=0, ycorrection:=0) {
+	WinGet, progid, , %windowtitle%
+	zombidlescreen := Gdip_BitmapFromScreen("hwnd:"progid)
+	searchpic := Gdip_CreateBitmapFromFile(png)
+	findings := Gdip_ImageSearch(zombidlescreen,searchpic, outputlist)
+	Gdip_DisposeImage(zombidlescreen)
+	Gdip_DisposeImage(searchpic)
+	if (findings > 0) {
+		StringSplit, clickpositions, outputlist, `,
+		outputlist := "x"clickpositions1 + xcorrection " y"clickpositions2 + ycorrection
+		return outputlist
+	} else {
+		return -1
+	}
+}
+
+exitfunc() {
+	global
+	saveinifunc()
+	Gdip_Shutdown(pToken)
+	logger("[GAME] Bot closed. Bye")
+}
+
 ;=============================
 ;=== Buttons and Controlls ===
 ;=============================
@@ -996,3 +1130,6 @@ GuiControlGet, autoabilityon
 
 autochest:
 GuiControlGet, autocheston
+
+autoscroll:
+GuiControlGet, autoscrollon
