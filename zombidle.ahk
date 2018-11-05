@@ -409,6 +409,32 @@ switchworld(curworld, reset:=false) {
 		sleep 4000
 		ControlClick, x550 y550,%windowtitle%,,,, Pos NA		
 	}
+	if (curworld = "7") {
+		loop, 3 {
+			ControlClick, x860 y490,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 4000
+		ControlClick, x980 y160,%windowtitle%,,,, Pos NA
+		sleep 4000
+		ControlClick, x200 y350,%windowtitle%,,,, Pos NA		
+	}
+	if (curworld = "8") {
+		loop, 3 {
+			ControlClick, x960 y430,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 4000
+		ControlClick, x450 y300,%windowtitle%,,,, Pos NA	
+	}
+	if (curworld = "9") {
+		loop, 3 {
+			ControlClick, x740 y610,%windowtitle%,,,, Pos NA
+			sleep 50
+		}
+		sleep 4000
+		ControlClick, x300 y600,%windowtitle%,,,, Pos NA	
+	}	
 
 	if (reset = true) {
 		clickpos := imagesearcher("imgs/reset.png")
@@ -692,6 +718,36 @@ checkworld() {
 									world := "6"
 									logger("[PROGRESS] World 6 is complete.")
 								}
+							} else {
+								clickpos := imagesearcher("imgs/world7complete.png")
+								if (clickpos != -1) {
+									sleep 4000
+									clickpos := imagesearcher("imgs/world7complete.png")
+									if (clickpos != -1) {
+										world := "7"
+										logger("[PROGRESS] World 7 is complete.")
+									}
+								} else {
+									clickpos := imagesearcher("imgs/world8complete.png",,,10)
+									if (clickpos != -1) {
+										sleep 4000
+										clickpos := imagesearcher("imgs/world8complete.png",,,10)
+										if (clickpos != -1) {
+											world := "8"
+											logger("[PROGRESS] World 8 is complete.")
+										}
+									} else {
+										clickpos := imagesearcher("imgs/world9complete.png",,,10)
+										if (clickpos != -1) {
+											sleep 4000
+											clickpos := imagesearcher("imgs/world9complete.png",,,10)
+											if (clickpos != -1) {
+												world := "9"
+												logger("[PROGRESS] World 9 is complete.")
+											}
+										} 
+									}
+								}
 							}
 						}
 					}
@@ -712,7 +768,7 @@ upgrademonster() {
 	}
 
 	if (Mod(upgrademonstertimer, upgradecarlinterval) = 0) {
-		clickpos := imagesearcher("imgs/upgrade.png", 0)
+		clickpos := imagesearcher("imgs/upgrade.png", 0,0, 10)
 		if (clickpos != -1) {
 			logger("[PROGRESS] Leveling Carl.")
 			SetTimer, AutoFire, Off
@@ -899,7 +955,7 @@ identifiyloot() {
 			minuslevel++
 			graph := "5_Level"
 		} else {
-			clickpos := imagesearcher("imgs/craftboost.png")
+			clickpos := imagesearcher("imgs/crafttime.png")
 			if (clickpos != -1) {
 				logger("[LOOT] reduced 4h crafting time")
 				crafttime++
@@ -933,6 +989,7 @@ identifiyloot() {
 								logger("[LOOT] **** ERROR **** - could not identify loot")
 								; TrayTip, WTF Loot, WTF Loot, 10, 1
 								graph := "NA"
+								pause
 							}
 						}
 					}
@@ -1060,11 +1117,11 @@ checkupdate() {
 	}
 }
 
-imagesearcher(png, xcorrection:=0, ycorrection:=0) {
+imagesearcher(png, xcorrection:=0, ycorrection:=0, variation:=0) {
 	WinGet, progid, , %windowtitle%
 	zombidlescreen := Gdip_BitmapFromScreen("hwnd:"progid)
 	searchpic := Gdip_CreateBitmapFromFile(png)
-	findings := Gdip_ImageSearch(zombidlescreen,searchpic, outputlist)
+	findings := Gdip_ImageSearch(zombidlescreen,searchpic, outputlist,,,,,variation)
 	Gdip_DisposeImage(zombidlescreen)
 	Gdip_DisposeImage(searchpic)
 	if (findings > 0) {
