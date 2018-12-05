@@ -21,7 +21,6 @@ autolevelon := false
 autoabilityon := true
 autoscrollon := true
 autolevelon := true
-autocheston := false
 
 world := "unknown"
 currenttab := "unknown"
@@ -51,6 +50,7 @@ IniRead, windowheight, privatesettings.ini, general, windowheight, 760
 IniRead, graphiteenable, privatesettings.ini, general, graphiteenable, false
 IniRead, graphitehost, privatesettings.ini, general, graphitehost, 127.0.0.1
 IniRead, graphiteport, privatesettings.ini, general, graphiteport, 2003
+IniRead, pauseunknown, privatesettings.ini, general, pauseunknown, false
 
 IniRead, portal, privatesettings.ini, game, portal, 1
 
@@ -138,9 +138,7 @@ Gui, +AlwaysOnTop -SysMenu +Owner
 Gui, Add, Text, x12 y30 , Click:
 Gui, Add, Radio, xp+75 yp gclicker vautoclickeron checked, On
 Gui, Add, Radio, xp+50 yp gclicker, Off
-Gui, Add, Text, xp+70 yp, find chests:
-Gui, Add, Radio, xp+75 yp gautochest vautocheston, On
-Gui, Add, Radio, xp+50 yp gautochest checked, Off
+Gui, Add, Text, vcraftready xp+70 yp w150, Loading ........
 Gui, Add, Text, x12 yp+20, Buy monster:
 Gui, Add, Radio, xp+75 yp gautolevel vautolevelon checked, On
 Gui, Add, Radio, xp+50 yp gautolevel, Off
@@ -151,7 +149,7 @@ Gui, Add, Text, x12 yp+20, click scrolls:
 Gui, Add, Radio, xp+75 yp gautoscroll vautoscrollon checked, On
 Gui, Add, Radio, xp+50 yp gautoscroll, Off
 Gui, Add, GroupBox, x2 y9 w180 h100 , automatic actions
-Gui, Add, GroupBox, xp+190 y9 w180 h100 , world actions
+Gui, Add, GroupBox, xp+190 y9 w180 h100 , status information
 Gui, Add, Text, vStatus x12 w400, Starting Bot!
 Gui, Add, Text,vstatus2 x12 w400,
 Gui, Add, Text,vstatus4 x12 w400,
@@ -286,6 +284,7 @@ generalLoop() {
 			checkworld()
 			scrollHandle()
 		}
+		checkcraftready()
 		sleep 1000
 	}
 }
@@ -310,6 +309,27 @@ checkgame(stat) {
 	}
 }
 
+checkcraftready() {
+	global
+	clickpos := imagesearcher("imgs/craftready.png")
+	if (clickpos != -1) {
+		GuiControl,,craftready, Craft ready!
+		Gui, Font, cRed Bold, 
+		GuiControl,Font, craftready,
+	} else {
+		clickpos := imagesearcher("imgs/craftboostready.png")	
+		if (clickpos != -1) {
+			GuiControl,,craftready, Craftboost ready!
+			Gui, Font, cRed Bold, 
+			GuiControl,Font, craftready,
+		} else {
+			GuiControl,,craftready, Craft in progress
+			Gui, Font, cBlack Bold,
+			GuiControl,Font, craftready,
+		}	
+	}
+}
+
 switchworld(curworld, reset:=false) {
 	global
 	SetTimer, AutoFire, Off
@@ -321,10 +341,6 @@ switchworld(curworld, reset:=false) {
 			sleep 50
 		}
 		sleep 1000
-	}
-
-	if (autocheston and curworld != "new") {
-		collectchests(curworld)
 	}
 
 	logger("[PROGRESS] Switching world")
@@ -456,182 +472,6 @@ switchworld(curworld, reset:=false) {
 	}
 
 	activateautofire()
-}
-
-collectchests(curworld) {
-	global
-	logger("[PROGRESS] Collecting chest")
-
-	loop, 15 {
-		ControlClick, %scrollleft%, %windowtitle%,,,, Pos NA
-		sleep 75
-	}
-	if (curworld = "1") {
-		loop, 3 {
-			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
-			sleep 75
-		}
-		sleep 500
-		ControlClick, x560 y606,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x860 y620,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x860 y620,%windowtitle%,,,, Pos NA
-		sleep 5000
-		loop, 3 {
-			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
-			sleep 75
-		}
-		ControlClick, x864 y451,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x864 y451,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x874 y532,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x874 y532,%windowtitle%,,,, Pos NA
-		sleep 5000
-		loop, 5 {
-			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
-			sleep 75
-		}
-		sleep 500
-		ControlClick, x911 y470,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		; ControlClick, x911 y470,%windowtitle%,,,, Pos NA
-		; sleep 5000
-		; loop, 30 {
-			; ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
-			; sleep 100
-		; }
-		; ControlClick, x842 y521,%windowtitle%,,,, Pos NA
-		; sleep 5000
-		; lootprio()
-		; sleep 1000
-	}
-
-	if (curworld = "2") {
-		ControlClick, x544 y515,%windowtitle%,,,, Pos NA
-		sleep 5000
-		loop, 9 {
-			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
-			sleep 75
-		}
-		ControlClick, x521 y379,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x521 y379,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x850 y580,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x904 y636,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x850 y580,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		; sleep 5000
-		; ControlClick, x904 y636,%windowtitle%,,,, Pos NA
-		; sleep 5000
-		; loop, 30 {
-			; ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
-			; sleep 100
-		; }
-		; ControlClick, x904 y636,%windowtitle%,,,, Pos NA
-		; sleep 5000
-	}
-
-	if (curworld = "3") {
-		ControlClick, x513 y596,%windowtitle%,,,, Pos NA
-		sleep 5000
-		loop, 3 {
-			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
-			sleep 75
-		}
-		ControlClick, x702 y365,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x702 y365,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x954 y621,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x954 y621,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x809 y400,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		; ControlClick, x809 y400,%windowtitle%,,,, Pos NA
-		; sleep 1000
-		; loop, 30 {
-			; ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
-			; sleep 100
-		; }
-		; ControlClick, x954 y621,%windowtitle%,,,, Pos NA
-		; sleep 5000
-		; lootprio()
-		; sleep 1000
-	}
-
-	if (curworld = "4") {
-		loop, 5 {
-			ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
-			sleep 75
-		}
-		ControlClick, x520 y460,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x960 y650,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		ControlClick, x960 y650,%windowtitle%,,,, Pos NA
-		sleep 5000
-		ControlClick, x670 y670,%windowtitle%,,,, Pos NA
-		sleep 5000
-		lootprio()
-		sleep 5000
-		; ControlClick, x670 y670,%windowtitle%,,,, Pos NA
-		; sleep 1000
-		; loop, 6 {
-			; ControlClick, %scrollright%, %windowtitle%,,,, Pos NA
-			; sleep 75
-		; }
-		; ControlClick, x900 y400,%windowtitle%,,,, Pos NA
-		; sleep 5000
-		; loop, 30 {
-			; ControlClick, %autoclick%, %windowtitle%,,,, Pos NA
-			; sleep 100
-		; }
-		; ControlClick, x700 y520,%windowtitle%,,,, Pos NA
-		; sleep 5000
-		; lootprio()
-		; sleep 1000
-	}
-
 }
 
 gettab() {
@@ -773,13 +613,21 @@ upgrademonster() {
 			logger("[PROGRESS] Leveling Carl.")
 			SetTimer, AutoFire, Off
 			sleep 1000
-			ControlClick, x960 y660, %windowtitle%,,,, Pos NA
-			sleep 500
-			ControlClick, x960 y600, %windowtitle%,,,, Pos NA
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
 			sleep 1000
 			activateautofire()
 
 		}
+		clickpos := imagesearcher("imgs/upgrade2.png", 0,0, 10)
+		if (clickpos != -1) {
+			logger("[PROGRESS] Leveling Carl.")
+			SetTimer, AutoFire, Off
+			sleep 1000
+			ControlClick, %clickpos%, %windowtitle%,,,, Pos NA
+			sleep 1000
+			activateautofire()
+
+		}		
 	}
 
 	if (upgrademonstertimer >= upgradeinterval) {
@@ -989,7 +837,9 @@ identifiyloot() {
 								logger("[LOOT] **** ERROR **** - could not identify loot")
 								; TrayTip, WTF Loot, WTF Loot, 10, 1
 								graph := "NA"
-								pause
+								if (pauseunknown = true) {
+									pause
+								}
 							}
 						}
 					}
@@ -1062,6 +912,7 @@ saveinifunc() {
 	IniWrite, %graphiteport%, privatesettings.ini, general, graphiteport
 	IniWrite, %graphiteenable%, privatesettings.ini, general, graphiteenable
 	IniWrite, "%windowtitle%", privatesettings.ini, general, windowtitle
+	IniWrite, %pauseunknown%, privatesettings.ini, general, pauseunknown
 
 	IniWrite, %portal%, privatesettings.ini, game, portal
 
@@ -1184,9 +1035,6 @@ GuiControlGet, autolevelon
 
 autoability:
 GuiControlGet, autoabilityon
-
-autochest:
-GuiControlGet, autocheston
 
 autoscroll:
 GuiControlGet, autoscrollon
