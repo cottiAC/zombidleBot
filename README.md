@@ -1,3 +1,7 @@
+# EOL
+zombidle devolopment stalled. The game is actually dead so is this bot.
+It was a nice time. Good bye Bob!
+
 # zombidleBot
 Autohotkey project for idle game [Zombidle](http://www.zombidle.de)
 
